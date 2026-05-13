@@ -1,0 +1,46 @@
+=== Daily News Briefing — 2026년 05월 13일 (수) ===
+
+[kr_general] 뉴스 수집 중...
+  [연합뉴스] SKIP — <urlopen error [SSL: UNSAFE_LEGACY_RENEGOTIATION_DISABLED] unsafe legacy renegotiation disabled (_ssl.c:1010)>
+  [KBS 뉴스] 0 articles fetched
+  [중앙일보] 0 articles fetched
+  [동아일보] 2 articles fetched
+  → 2개 수집 완료
+
+[kr_stock] 뉴스 수집 중...
+  [한국경제] 2 articles fetched
+  [매일경제] 0 articles fetched
+  [연합인포맥스] 2 articles fetched
+  → 4개 수집 완료
+
+[kr_legal] 뉴스 수집 중...
+  [법률신문] SKIP — HTTP Error 404: Not Found
+  [법률저널] SKIP — HTTP Error 404: Not Found
+  [법률방송] SKIP — HTTP Error 404: Not Found
+  → 0개 수집 완료
+
+[en_politics] 뉴스 수집 중...
+  [NPR Politics] 2 articles fetched
+  [BBC US] 2 articles fetched
+  → 4개 수집 완료
+
+[en_economy] 뉴스 수집 중...
+  [Yahoo Finance] 2 articles fetched
+  [CNBC Markets] 2 articles fetched
+  → 4개 수집 완료
+
+[en_legal] 뉴스 수집 중...
+  [SCOTUSblog] 2 articles fetched
+  [Above the Law] 2 articles fetched
+  → 4개 수집 완료
+
+[en_bar] 뉴스 수집 중...
+  [Law School Toolbox] 2 articles fetched
+  [JD Advising] 2 articles fetched
+  → 4개 수집 완료
+
+이메일 HTML 빌드 중...
+발송 중: 📰 Daily News Briefing — 2026년 05월 13일 (수)
+  FROM : onboarding@resend.dev
+  TO   : ['sergeykwon@gmail.com']
+✅ 발송 완료! id=68be77eb-761e-49d1-9937-f29e61f59c8b
