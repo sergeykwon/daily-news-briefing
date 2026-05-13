@@ -1,0 +1,93 @@
+=== Daily News Briefing — 2026년 05월 13일 (수) ===
+
+[kr_politics]
+  [동아일보 정치] 3 articles
+  [KBS 정치] 0 articles
+  [한겨레 정치] 3 articles
+  → 4개
+
+[kr_economy]
+  [한국경제] 3 articles
+  [매일경제 경제] 3 articles
+  → 4개
+
+[kr_society]
+  [동아일보 사회] 0 articles
+  [KBS 사회] 0 articles
+  [한겨레 사회] 3 articles
+  → 3개
+
+[kr_sports]
+  [동아일보 스포츠] 3 articles
+  [KBS 스포츠] 0 articles
+  [네이버 스포츠] SKIP — HTTP Error 404: Not Found
+  → 3개
+
+[kr_market]
+  [한국경제 증권] 4 articles
+  → 4개
+
+[kr_stocks]
+  [한국경제 종목] 5 articles
+  → 5개
+
+[kr_crypto]
+  [코인데스크코리아] SKIP — HTTP Error 415: Unsupported Media Type
+  [토큰포스트] 4 articles
+  → 4개
+
+[kr_legal]
+  [법률신문] SKIP — HTTP Error 404: Not Found
+  [법률저널] SKIP — HTTP Error 404: Not Found
+  [로앤비 판례] SKIP — Remote end closed connection without response
+  → 0개
+
+[en_politics]
+  [NPR Politics] 3 articles
+  [BBC US] 3 articles
+  → 4개
+
+[en_economy]
+  [Yahoo Finance] SKIP — HTTP Error 429: Too Many Requests
+  [CNBC Economy] SKIP — HTTP Error 403: Forbidden
+  [Reuters Business] SKIP — <urlopen error [Errno -2] Name or service not known>
+  → 0개
+
+[en_society]
+  [AP News] SKIP — HTTP Error 403: Forbidden
+  [Reuters World] SKIP — <urlopen error [Errno -2] Name or service not known>
+  [ESPN] 0 articles
+  → 0개
+
+[en_market]
+  [Yahoo Finance] SKIP — HTTP Error 429: Too Many Requests
+  [CNBC Markets] SKIP — HTTP Error 403: Forbidden
+  [MarketWatch] 4 articles
+  → 4개
+
+[en_stocks]
+  [Yahoo Finance] SKIP — HTTP Error 429: Too Many Requests
+  [Motley Fool] 5 articles
+  → 5개
+
+[en_crypto]
+  [CoinDesk] 4 articles
+  → 4개
+
+[en_legal]
+  [SCOTUSblog] 3 articles
+  [Above the Law] 3 articles
+  → 4개
+
+[en_bar]
+  [Law School Toolbox] 0 articles
+  [JD Advising] 3 articles
+  [BARBRI Blog] SKIP — HTTP Error 404: Not Found
+  → 3개
+
+HTML 빌드 중...
+
+발송: 📰 Daily News Briefing — 2026년 05월 13일 (수)
+  FROM : onboarding@resend.dev
+  TO   : ['sergeykwon@gmail.com']
+✅ 발송 완료! id=237c0855-5c9d-439d-aa54-ec42d0bf88fe
