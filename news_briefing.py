@@ -33,21 +33,21 @@ DATE_STR = NOW.strftime("%Y년 %m월 %d일 (%a)").replace(
 
 FEEDS = {
     "kr_general": [
-        ("연합뉴스",  "https://www.yonhapnewstv.co.kr/feed/"),
+        ("연합뉴스",  "https://www.yonhapnews.co.kr/rss/0/0/index.rss"),
         ("KBS 뉴스",  "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS"),
-        ("SBS 뉴스",  "https://news.sbs.co.kr/news/rss/rss.do?pNo=00&menuTypeCd=RECENT"),
-        ("조선일보",  "https://www.chosun.com/arc/outboundfeeds/rss/"),
+        ("중앙일보",  "https://rss.joins.com/joins_news_list.xml"),
+        ("동아일보",  "https://rss.donga.com/total.xml"),
     ],
     "kr_stock": [
         ("한국경제",   "https://www.hankyung.com/feed/all-news"),
         ("매일경제",   "https://www.mk.co.kr/rss/30100061/"),
-        ("이데일리",   "https://www.edaily.co.kr/rss/economy.xml"),
-        ("KBS 경제",  "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=economy"),
+        ("연합인포맥스","https://news.einfomax.co.kr/rss/allArticle.xml"),
+        ("뉴스핌",     "https://www.newspim.com/rss/S0201"),
     ],
     "kr_legal": [
         ("법률신문",   "https://www.lawtimes.co.kr/api/rss"),
         ("법률저널",   "https://www.lec.co.kr/rss/allNews.xml"),
-        ("헤럴드법률", "https://biz.heraldcorp.com/rss/010000000000.xml"),
+        ("법률방송",   "https://www.ltn.kr/rss/rss.php"),
     ],
     "en_politics": [
         ("NPR Politics",  "https://feeds.npr.org/1001/rss.xml"),
@@ -219,6 +219,7 @@ def send_email(subject: str, html: str) -> None:
         headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
+            "User-Agent": "curl/8.5.0",
         },
         method="POST",
     )
