@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """
-Daily News Briefing — RSS 수집 + Resend 이메일 자동 발송
+Daily News Briefing — Marketing Brew style
 매일 오전 7:30 KST (GitHub Actions cron)
 """
 
-import os, json, re, urllib.request, urllib.error, sys
+import os, json, re, sys, urllib.request, urllib.error
 from datetime import datetime, timezone, timedelta
 
 try:
     import feedparser
 except ImportError:
-    raise SystemExit("feedparser 미설치: pip install feedparser")
+    raise SystemExit("feedparser not installed: pip install feedparser")
+
+try:
+    import yfinance as yf
+    HAS_YF = True
+except ImportError:
+    HAS_YF = False
+    print("WARNING: yfinance not installed — market data skipped")
 
 # ─── 설정 ─────────────────────────────────────────────────────────────────────
 
@@ -22,127 +29,178 @@ TO_EMAILS      = [_to_override] if _to_override else ["cmkim0316@gmail.com", "se
 
 KST      = timezone(timedelta(hours=9))
 NOW      = datetime.now(KST)
-DATE_STR = NOW.strftime("%Y년 %m월 %d일 (%a)").replace(
+DATE_KR  = NOW.strftime("%Y년 %m월 %d일 (%a)").replace(
     "Mon","월").replace("Tue","화").replace("Wed","수").replace(
     "Thu","목").replace("Fri","금").replace("Sat","토").replace("Sun","일")
+DATE_EN  = NOW.strftime("%B %d, %Y")
 
-# ─── RSS 피드 정의 ─────────────────────────────────────────────────────────────
-# (name, url, max_items)
+# ─── 마켓 워치리스트 ──────────────────────────────────────────────────────────
+
+KR_INDICES = [
+    ("KOSPI",      "^KS11",    "index_kr"),
+    ("KOSDAQ",     "^KQ11",    "index_kr"),
+    ("USD/KRW",    "KRW=X",    "fx"),
+]
+KR_STOCKS = [
+    ("삼성전자",   "005930.KS", "stock_kr"),
+    ("SK하이닉스", "000660.KS", "stock_kr"),
+    ("NAVER",      "035420.KS", "stock_kr"),
+    ("카카오",     "035720.KS", "stock_kr"),
+]
+KR_CRYPTO = [
+    ("Bitcoin",    "BTC-USD",  "crypto"),
+    ("Ethereum",   "ETH-USD",  "crypto"),
+]
+
+US_INDICES = [
+    ("Nasdaq",     "^IXIC",   "index_us"),
+    ("S&P 500",    "^GSPC",   "index_us"),
+    ("Dow Jones",  "^DJI",    "index_us"),
+    ("10-Year",    "^TNX",    "rate"),
+]
+US_STOCKS = [
+    ("Amazon",     "AMZN",    "stock_us"),
+    ("Google",     "GOOGL",   "stock_us"),
+    ("Apple",      "AAPL",    "stock_us"),
+    ("NVTS",       "NVTS",    "stock_us"),
+    ("Oracle",     "ORCL",    "stock_us"),
+    ("Intel",      "INTC",    "stock_us"),
+    ("NVIDIA",     "NVDA",    "stock_us"),
+]
+US_CRYPTO = [
+    ("Bitcoin",    "BTC-USD", "crypto"),
+    ("Ethereum",   "ETH-USD", "crypto"),
+]
+
+# ─── RSS 피드 ─────────────────────────────────────────────────────────────────
 
 FEEDS = {
-    # ── 국내 뉴스 ──────────────────────────────────────────────────────────────
     "kr_politics": [
-        ("동아일보 정치",     "https://rss.donga.com/politics.xml",        3),
-        ("KBS 정치",         "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=politics", 3),
-        ("한겨레 정치",       "https://www.hani.co.kr/rss/politics/",       3),
+        ("동아일보 정치",  "https://rss.donga.com/politics.xml",         3),
+        ("한겨레 정치",    "https://www.hani.co.kr/rss/politics/",        3),
+        ("KBS 정치",      "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=politics", 3),
     ],
     "kr_economy": [
-        ("한국경제",          "https://www.hankyung.com/feed/economy",      3),
-        ("매일경제 경제",      "https://www.mk.co.kr/rss/30100041/",        3),
-        ("동아일보 경제",      "https://rss.donga.com/economy.xml",         3),
+        ("한국경제",       "https://www.hankyung.com/feed/economy",       3),
+        ("매일경제",       "https://www.mk.co.kr/rss/30100041/",          3),
+        ("동아일보 경제",  "https://rss.donga.com/economy.xml",           3),
     ],
     "kr_society": [
-        ("동아일보 사회",      "https://rss.donga.com/society.xml",         3),
-        ("KBS 사회",          "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=society", 3),
-        ("한겨레 사회",        "https://www.hani.co.kr/rss/society/",       3),
+        ("한겨레 사회",    "https://www.hani.co.kr/rss/society/",         3),
+        ("동아일보 사회",  "https://rss.donga.com/society.xml",           3),
     ],
     "kr_sports": [
-        ("동아일보 스포츠",    "https://rss.donga.com/sports.xml",          3),
-        ("KBS 스포츠",        "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=sports", 3),
-        ("네이버 스포츠",      "https://sports.news.naver.com/news/rss.nhn", 3),
+        ("동아일보 스포츠","https://rss.donga.com/sports.xml",            3),
+        ("KBS 스포츠",    "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=sports", 3),
     ],
-
-    # ── 국내외 주식/크립토 ─────────────────────────────────────────────────────
-    "kr_market": [
-        ("한국경제 증권",      "https://www.hankyung.com/feed/finance",     4),
-        ("연합인포맥스",       "https://news.einfomax.co.kr/rss/allArticle.xml", 4),
-        ("매일경제 증권",      "https://www.mk.co.kr/rss/30100061/",        4),
-        ("뉴스핌 증권",        "https://www.newspim.com/rss/S0201",         3),
+    "kr_market_news": [
+        ("한국경제 증권",  "https://www.hankyung.com/feed/finance",       4),
+        ("연합인포맥스",   "https://news.einfomax.co.kr/rss/allArticle.xml", 4),
+        ("뉴스핌 증권",    "https://www.newspim.com/rss/S0201",           3),
     ],
-    "kr_stocks": [
-        ("한국경제 종목",      "https://www.hankyung.com/feed/finance",     5),
-        ("이데일리 종목",      "https://www.edaily.co.kr/rss/stock.xml",    5),
-        ("머니투데이 종목",    "https://www.mt.co.kr/rss/stock.xml",        4),
-        ("팍스넷",            "https://paxnet.co.kr/rss/news.xml",          4),
+    "kr_crypto_news": [
+        ("토큰포스트",     "https://tokenpost.kr/rss",                    4),
+        ("블록미디어",     "https://www.blockmedia.co.kr/feed",           4),
+        ("디센터",         "https://decenter.kr/rss",                     3),
     ],
-    "kr_crypto": [
-        ("토큰포스트",         "https://tokenpost.kr/rss",                   4),
-        ("블록미디어",         "https://www.blockmedia.co.kr/feed",          4),
-        ("디센터",            "https://decenter.kr/rss",                    4),
-        ("코인리더스",         "https://coinreaders.com/rss",                3),
-    ],
-
-    # ── 국내 법률 ─────────────────────────────────────────────────────────────
     "kr_legal": [
-        ("법률신문",          "https://www.lawtimes.co.kr/api/rss",         3),
-        ("헤럴드 법률",        "https://biz.heraldcorp.com/rss/010000000000.xml", 3),
-        ("한국경제 법률",      "https://www.hankyung.com/feed/society",      3),
+        ("법률신문",       "https://www.lawtimes.co.kr/api/rss",          3),
+        ("한국경제 사회",  "https://www.hankyung.com/feed/society",       3),
     ],
-
-    # ── 미국 뉴스 ─────────────────────────────────────────────────────────────
     "en_politics": [
-        ("NPR Politics",      "https://feeds.npr.org/1001/rss.xml",         3),
-        ("BBC US",            "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml", 3),
-        ("Reuters Politics",  "https://feeds.reuters.com/Reuters/PoliticsNews", 3),
+        ("NPR Politics",  "https://feeds.npr.org/1001/rss.xml",           3),
+        ("BBC US",        "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml", 3),
     ],
     "en_economy": [
-        ("CNBC Economy",      "https://www.cnbc.com/id/20910258/device/rss/rss.html", 3),
-        ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 3),
-        ("NPR Economy",       "https://feeds.npr.org/1006/rss.xml",         3),
+        ("CNBC Economy",  "https://www.cnbc.com/id/20910258/device/rss/rss.html", 3),
+        ("MarketWatch",   "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 3),
+        ("NPR Economy",   "https://feeds.npr.org/1006/rss.xml",           3),
     ],
     "en_society": [
-        ("BBC World",         "https://feeds.bbci.co.uk/news/world/rss.xml",3),
-        ("ESPN",              "https://www.espn.com/espn/rss/news",         3),
-        ("NPR World",         "https://feeds.npr.org/1004/rss.xml",         3),
+        ("BBC World",     "https://feeds.bbci.co.uk/news/world/rss.xml",  3),
+        ("ESPN",          "https://www.espn.com/espn/rss/news",           3),
+        ("NPR World",     "https://feeds.npr.org/1004/rss.xml",           3),
     ],
-
-    # ── 미국 주식/크립토 ──────────────────────────────────────────────────────
-    "en_market": [
-        ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 4),
-        ("CNBC Markets",      "https://www.cnbc.com/id/100003114/device/rss/rss.html", 4),
-        ("Investopedia",      "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline", 3),
+    "en_market_news": [
+        ("MarketWatch",   "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 4),
+        ("Motley Fool",   "https://www.fool.com/feeds/index.aspx",        4),
+        ("Investopedia",  "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline", 3),
     ],
-    "en_stocks": [
-        ("Motley Fool",       "https://www.fool.com/feeds/index.aspx",      5),
-        ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 5),
-        ("Investopedia",      "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline", 4),
+    "en_crypto_news": [
+        ("CoinDesk",      "https://www.coindesk.com/arc/outboundfeeds/rss/", 4),
+        ("CoinTelegraph", "https://cointelegraph.com/rss",                 4),
+        ("Decrypt",       "https://decrypt.co/feed",                       3),
     ],
-    "en_crypto": [
-        ("CoinDesk",          "https://www.coindesk.com/arc/outboundfeeds/rss/", 4),
-        ("CoinTelegraph",     "https://cointelegraph.com/rss",              4),
-        ("Decrypt",           "https://decrypt.co/feed",                   4),
-        ("The Block",         "https://www.theblock.co/rss.xml",            3),
-    ],
-
-    # ── 미국 법률 & BAR ───────────────────────────────────────────────────────
     "en_legal": [
-        ("SCOTUSblog",        "https://www.scotusblog.com/feed/",           3),
-        ("Above the Law",     "https://abovethelaw.com/feed/",              3),
-        ("Law360",            "https://www.law360.com/rss/articles",        3),
+        ("SCOTUSblog",    "https://www.scotusblog.com/feed/",              3),
+        ("Above the Law", "https://abovethelaw.com/feed/",                 3),
     ],
     "en_bar": [
-        ("Law School Toolbox","https://lawschooltoolbox.com/feed/",         3),
-        ("JD Advising",       "https://jdadvising.com/feed/",               3),
-        ("BARBRI Blog",       "https://www.barbri.com/blog/feed/",           3),
+        ("JD Advising",   "https://jdadvising.com/feed/",                  3),
+        ("Law School Toolbox", "https://lawschooltoolbox.com/feed/",       3),
     ],
 }
 
-# ─── 유틸리티 ──────────────────────────────────────────────────────────────────
+# ─── 마켓 데이터 수집 ──────────────────────────────────────────────────────────
+
+def fmt_price(sym: str, kind: str, val: float) -> str:
+    if kind == "rate":
+        return f"{val:.3f}%"
+    elif kind == "crypto":
+        return f"${val:,.0f}"
+    elif kind == "fx":
+        return f"₩{val:,.1f}"
+    elif kind in ("stock_kr", "index_kr"):
+        return f"₩{val:,.0f}" if kind == "stock_kr" else f"{val:,.2f}"
+    else:
+        return f"${val:,.2f}" if kind == "stock_us" else f"{val:,.2f}"
+
+def fetch_prices(watchlist: list) -> list[dict]:
+    if not HAS_YF:
+        return []
+    symbols = [w[1] for w in watchlist]
+    results = []
+    try:
+        data = yf.download(symbols, period="2d", progress=False, auto_adjust=True, threads=True)
+        closes = data["Close"] if hasattr(data["Close"], "columns") else data[["Close"]].rename(columns={"Close": symbols[0]})
+        for name, sym, kind in watchlist:
+            try:
+                col = closes[sym]
+                prices = col.dropna()
+                if len(prices) < 2:
+                    continue
+                prev = float(prices.iloc[-2])
+                curr = float(prices.iloc[-1])
+                chg_pct = (curr - prev) / prev * 100
+                if kind == "rate":
+                    chg_str = f"{(curr - prev) * 100:+.1f} bps"
+                else:
+                    chg_str = f"{chg_pct:+.2f}%"
+                results.append({
+                    "name": name, "symbol": sym, "kind": kind,
+                    "price": fmt_price(sym, kind, curr),
+                    "change": chg_str,
+                    "up": chg_pct >= 0,
+                    "chg_pct": chg_pct,
+                })
+                print(f"  [{sym}] {fmt_price(sym, kind, curr)} {chg_str}")
+            except Exception as e:
+                print(f"  [{sym}] price error: {e}")
+    except Exception as e:
+        print(f"  [market] download error: {e}")
+    return results
+
+# ─── RSS 수집 ─────────────────────────────────────────────────────────────────
 
 def strip_tags(text: str) -> str:
     text = re.sub(r"<[^>]+>", " ", text or "")
-    text = re.sub(r"&[a-z]+;", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
-
-def truncate(text: str, n: int) -> str:
-    return text[:n] + "…" if len(text) > n else text
+    return re.sub(r"\s+", " ", re.sub(r"&[a-z]+;", " ", text)).strip()
 
 def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
-    headers = {
+    req = urllib.request.Request(url, headers={
         "User-Agent": "curl/8.5.0",
         "Accept": "application/rss+xml, application/xml, text/xml, */*",
-    }
-    req = urllib.request.Request(url, headers=headers)
+    })
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             raw = resp.read()
@@ -150,9 +208,10 @@ def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
         items = []
         for entry in feed.entries[:max_items]:
             title   = strip_tags(entry.get("title", "")).strip()
-            summary = truncate(strip_tags(
-                entry.get("summary") or entry.get("description", "")), 280)
-            link    = entry.get("link", url)
+            summary = strip_tags(entry.get("summary") or entry.get("description", ""))
+            if len(summary) > 260:
+                summary = summary[:260] + "…"
+            link = entry.get("link", url)
             if title:
                 items.append({"headline": title, "summary": summary, "url": link})
         print(f"  [{name}] {len(items)} articles")
@@ -161,16 +220,7 @@ def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
         print(f"  [{name}] SKIP — {e}")
         return []
 
-def collect(section: str) -> list[dict]:
-    items = []
-    for name, url, max_items in FEEDS[section]:
-        items.extend(fetch_feed(name, url, max_items))
-        if len(items) >= 4:
-            break
-    return items[:4]
-
-def collect_stocks(section: str, limit: int = 5) -> list[dict]:
-    """주식 종목은 더 많이 수집"""
+def collect(section: str, limit: int = 4) -> list[dict]:
     items = []
     for name, url, max_items in FEEDS[section]:
         items.extend(fetch_feed(name, url, max_items))
@@ -178,145 +228,197 @@ def collect_stocks(section: str, limit: int = 5) -> list[dict]:
             break
     return items[:limit]
 
-# ─── HTML 빌더 ─────────────────────────────────────────────────────────────────
+# ─── HTML 컴포넌트 ─────────────────────────────────────────────────────────────
 
-STYLES = """
-<style>
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f9;margin:0;padding:0}
-  .wrapper{max-width:720px;margin:30px auto;background:#fff;border-radius:12px;
-    overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)}
-  .header{background:linear-gradient(135deg,#1a237e,#283593);padding:28px 36px}
-  .header h1{color:#fff;margin:0;font-size:22px;font-weight:700}
-  .header p{color:#90caf9;margin:6px 0 0;font-size:13px}
-  .divider{height:5px;background:linear-gradient(90deg,#1a237e,#42a5f5)}
-  .lang-header{background:#eef1fb;padding:10px 36px;border-bottom:2px solid #dde2f5}
-  .lang-header span{font-size:13px;font-weight:800;color:#1a237e;letter-spacing:.3px}
-  .major-section{padding:22px 36px 4px;border-bottom:2px solid #e8ecf8}
-  .major-title{font-size:15px;font-weight:800;color:#1a237e;margin:0 0 14px;
-    padding-left:12px;border-left:4px solid #1a237e}
-  .sub-section{margin-bottom:16px}
-  .sub-label{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;
-    text-transform:uppercase;padding:3px 10px;border-radius:12px;margin-bottom:8px}
-  .sub-politics{background:#fce4ec;color:#c62828}
-  .sub-economy{background:#e8f5e9;color:#2e7d32}
-  .sub-society{background:#fff3e0;color:#e65100}
-  .sub-sports{background:#e3f2fd;color:#1565c0}
-  .sub-market{background:#e8f5e9;color:#1b5e20}
-  .sub-stocks{background:#fce4ec;color:#880e4f}
-  .sub-crypto{background:#ede7f6;color:#4527a0}
-  .sub-legal{background:#fff8e1;color:#f57f17}
-  .sub-bar{background:#e0f2f1;color:#004d40}
-  .news-item{background:#f8f9fc;border-radius:8px;padding:13px 15px;margin-bottom:8px}
-  .news-item.stock{border-left:3px solid #2e7d32}
-  .news-item.crypto{border-left:3px solid #6a1b9a}
-  .news-headline{font-size:13px;font-weight:700;color:#1a1a2e;margin:0 0 5px;line-height:1.4}
-  .news-summary{font-size:12px;color:#555;line-height:1.6;margin:0 0 7px}
-  .read-full{display:inline-block;font-size:11px;color:#1565c0;text-decoration:none;
-    font-weight:600;background:#e3f2fd;padding:2px 9px;border-radius:10px}
-  .footer{background:#f8f9fc;padding:18px 36px;text-align:center;color:#aaa;font-size:11px}
-</style>
-"""
+CSS = """<style>
+body{margin:0;padding:0;background:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+.shell{max-width:640px;margin:0 auto;background:#f0f0f0}
+.topbar{background:#f0f0f0;padding:8px 20px;text-align:center;font-size:11px;color:#888}
+.card{background:#fff;margin:0;padding:0}
+/* Header */
+.hdr{background:#1a1a2e;padding:28px 32px 22px}
+.hdr-title{color:#fff;font-size:26px;font-weight:800;letter-spacing:-0.5px;margin:0 0 4px}
+.hdr-sub{color:#8892b0;font-size:13px;margin:0}
+/* TOC */
+.toc{background:#f8f9fc;border-bottom:2px solid #e8ecf8;padding:14px 32px}
+.toc-title{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
+.toc-item{font-size:13px;color:#1a237e;line-height:2;display:block;text-decoration:none}
+/* Lang divider */
+.lang-div{background:#1a1a2e;padding:10px 32px}
+.lang-div span{color:#90caf9;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+/* Section */
+.section{padding:22px 32px;border-bottom:1px solid #eee}
+.cat-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:3px 10px;border-radius:3px;margin-bottom:12px}
+.tag-pol{background:#fce4ec;color:#b71c1c}
+.tag-eco{background:#e8f5e9;color:#1b5e20}
+.tag-soc{background:#fff3e0;color:#e65100}
+.tag-spt{background:#e3f2fd;color:#0d47a1}
+.tag-mkt{background:#e8f5e9;color:#1b5e20}
+.tag-cry{background:#ede7f6;color:#4527a0}
+.tag-leg{background:#fff8e1;color:#f57f17}
+.tag-bar{background:#e0f2f1;color:#004d40}
+/* Article */
+.art{margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed #eee}
+.art:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.art-hl{font-size:14px;font-weight:700;color:#1a1a2e;margin:0 0 5px;line-height:1.4}
+.art-sum{font-size:13px;color:#555;line-height:1.65;margin:0 0 6px}
+.art-link{font-size:12px;color:#1565c0;text-decoration:none;font-weight:600}
+.art-link:hover{text-decoration:underline}
+/* Market table */
+.mkt-box{margin:0 32px 22px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+.mkt-header{background:#1a237e;color:#fff;padding:10px 16px;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+.mkt-subheader{background:#f0f4ff;padding:7px 16px;font-size:11px;font-weight:700;color:#1a237e;letter-spacing:.5px;border-top:1px solid #dde2f5;border-bottom:1px solid #dde2f5}
+.mkt-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #f5f5f5;font-size:13px}
+.mkt-row:last-child{border-bottom:none}
+.mkt-arrow{width:18px;font-size:11px}
+.mkt-arrow.up{color:#2e7d32}
+.mkt-arrow.dn{color:#c62828}
+.mkt-name{flex:1;color:#333;font-weight:500}
+.mkt-sym{font-size:10px;color:#999;margin-left:5px}
+.mkt-price{font-weight:700;color:#1a1a2e;min-width:100px;text-align:right}
+.mkt-chg{min-width:90px;text-align:right}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11.5px;font-weight:700}
+.badge.up{background:#e8f5e9;color:#1b5e20}
+.badge.dn{background:#ffebee;color:#b71c1c}
+.mkt-note{padding:8px 16px;font-size:10px;color:#999;background:#fafafa;border-top:1px solid #f0f0f0}
+/* Footer */
+.footer{background:#1a1a2e;padding:20px 32px;text-align:center}
+.footer p{color:#555;font-size:11px;margin:4px 0}
+</style>"""
 
-def item_html(item: dict, css_class: str = "") -> str:
-    h = item["headline"].replace("<","&lt;").replace(">","&gt;")
-    s = item["summary"].replace("<","&lt;").replace(">","&gt;")
-    cls = f'news-item {css_class}' if css_class else 'news-item'
+def mkt_row_html(item: dict) -> str:
+    arrow_cls = "up" if item["up"] else "dn"
+    arrow     = "▲" if item["up"] else "▼"
+    badge_cls = "up" if item["up"] else "dn"
+    sym_tag   = f'<span class="mkt-sym">({item["symbol"]})</span>' if not item["symbol"].startswith("^") else ""
     return f"""
-      <div class="{cls}">
-        <div class="news-headline">{h}</div>
-        <div class="news-summary">{s}</div>
-        <a href="{item['url']}" class="read-full">Read Full &rarr;</a>
-      </div>"""
-
-def items_html(items: list[dict], css_class: str = "") -> str:
-    if not items:
-        return '<div class="news-item"><div class="news-summary">뉴스를 가져오지 못했습니다.</div></div>'
-    return "".join(item_html(i, css_class) for i in items)
-
-def sub_section(label: str, label_class: str, items: list[dict], css_class: str = "") -> str:
-    return f"""
-    <div class="sub-section">
-      <span class="sub-label {label_class}">{label}</span>
-      {items_html(items, css_class)}
+    <div class="mkt-row">
+      <div class="mkt-arrow {arrow_cls}">{arrow}</div>
+      <div class="mkt-name">{item["name"]}{sym_tag}</div>
+      <div class="mkt-price">{item["price"]}</div>
+      <div class="mkt-chg"><span class="badge {badge_cls}">{item["change"]}</span></div>
     </div>"""
 
-def build_html(news: dict) -> str:
+def market_table_html(title: str, indices: list, stocks: list, crypto: list, note: str = "") -> str:
+    idx_rows   = "".join(mkt_row_html(i) for i in indices)
+    stk_rows   = "".join(mkt_row_html(i) for i in stocks)
+    cry_rows   = "".join(mkt_row_html(i) for i in crypto)
+    note_html  = f'<div class="mkt-note">* {note}</div>' if note else ""
+    return f"""
+  <div class="mkt-box">
+    <div class="mkt-header">📊 {title}</div>
+    <div class="mkt-subheader">주요 지수 / Key Indices</div>
+    {idx_rows}
+    <div class="mkt-subheader">주요 종목 / Stocks</div>
+    {stk_rows}
+    <div class="mkt-subheader">크립토 / Crypto</div>
+    {cry_rows}
+    {note_html}
+  </div>"""
+
+def articles_html(items: list, tag_cls: str, tag_label: str) -> str:
+    if not items:
+        arts = '<div class="art"><p class="art-sum">뉴스를 가져오지 못했습니다.</p></div>'
+    else:
+        arts = "".join(f"""
+    <div class="art">
+      <div class="art-hl">{i['headline'].replace('<','&lt;').replace('>','&gt;')}</div>
+      <div class="art-sum">{i['summary'].replace('<','&lt;').replace('>','&gt;')}</div>
+      <a href="{i['url']}" class="art-link">Continue reading →</a>
+    </div>""" for i in items)
+    return f"""
+  <div class="section">
+    <span class="cat-tag {tag_cls}">{tag_label}</span>
+    {arts}
+  </div>"""
+
+def build_html(news: dict, mkt: dict) -> str:
+    kr_idx  = mkt.get("kr_indices", [])
+    kr_stk  = mkt.get("kr_stocks",  [])
+    kr_cry  = mkt.get("kr_crypto",  [])
+    us_idx  = mkt.get("us_indices", [])
+    us_stk  = mkt.get("us_stocks",  [])
+    us_cry  = mkt.get("us_crypto",  [])
+
+    kr_mkt_table = market_table_html(
+        "국내외 마켓 데이터", kr_idx, kr_stk, kr_cry,
+        "Data by Yahoo Finance. 장 마감 기준.")
+
+    us_mkt_table = market_table_html(
+        "U.S. Markets & Stocks", us_idx, us_stk, us_cry,
+        "Data provided by Yahoo Finance. As of market close.")
+
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-{STYLES}
+<title>Daily News Briefing — {DATE_KR}</title>
+{CSS}
 </head>
 <body>
-<div class="wrapper">
+<div class="shell">
+<div class="topbar">{DATE_EN} &nbsp;·&nbsp; Daily News Briefing</div>
 
-  <!-- HEADER -->
-  <div class="header">
-    <h1>&#128240; Daily News Briefing</h1>
-    <p>{DATE_STR} &nbsp;|&nbsp; &#127472;&#127479; 한국어 + &#127482;&#127480; English</p>
-  </div>
-  <div class="divider"></div>
+<div class="card">
 
-  <!-- ===== KOREAN ===== -->
-  <div class="lang-header"><span>&#127472;&#127479; 한국어 섹션</span></div>
-
-  <!-- 1. 오늘의 주요 뉴스 -->
-  <div class="major-section">
-    <div class="major-title">1&#47; 오늘의 주요 국내 뉴스</div>
-    {sub_section("&#128202; 정치", "sub-politics", news["kr_politics"])}
-    {sub_section("&#128200; 경제", "sub-economy",  news["kr_economy"])}
-    {sub_section("&#127960; 사회", "sub-society",  news["kr_society"])}
-    {sub_section("&#9917; 스포츠", "sub-sports",   news["kr_sports"])}
+  <!-- ── HEADER ──────────────────────────────────── -->
+  <div class="hdr">
+    <div class="hdr-title">📰 Daily News Briefing</div>
+    <div class="hdr-sub">{DATE_KR} &nbsp;|&nbsp; 🇰🇷 한국어 + 🇺🇸 English</div>
   </div>
 
-  <!-- 2. 주식/투자 -->
-  <div class="major-section">
-    <div class="major-title">2&#47; 국내외 주식 &amp; 투자 마켓</div>
-    {sub_section("&#128308; 주식 시장 (코스피&#47;코스닥&#47;글로벌)", "sub-market", news["kr_market"], "stock")}
-    {sub_section("&#128269; 주식 종목 상세", "sub-stocks", news["kr_stocks"], "stock")}
-    {sub_section("&#129689; 크립토 &amp; 스테이블코인", "sub-crypto", news["kr_crypto"], "crypto")}
+  <!-- ── TOC ─────────────────────────────────────── -->
+  <div class="toc">
+    <div class="toc-title">In today's edition</div>
+    <span class="toc-item">🇰🇷 오늘의 국내 주요 뉴스 — 정치 · 경제 · 사회 · 스포츠</span>
+    <span class="toc-item">📈 국내외 주식 &amp; 크립토 마켓</span>
+    <span class="toc-item">🇺🇸 Today's U.S. News — Politics · Economy · Society &amp; Sports</span>
+    <span class="toc-item">📊 U.S. Markets, Stocks &amp; Crypto</span>
+    <span class="toc-item">⚖️ Legal News &amp; BAR Exam</span>
   </div>
 
-  <!-- 3. 법률 -->
-  <div class="major-section" style="border-bottom:none">
-    <div class="major-title">3&#47; 법률 뉴스</div>
-    {sub_section("&#9878; 법률", "sub-legal", news["kr_legal"])}
-  </div>
+  <!-- ════════ 🇰🇷 KOREAN SECTION ════════ -->
+  <div class="lang-div"><span>🇰🇷 한국어 섹션</span></div>
 
-  <div class="divider"></div>
+  {articles_html(news["kr_politics"], "tag-pol", "🔴 정치")}
+  {articles_html(news["kr_economy"],  "tag-eco", "🟢 경제")}
+  {articles_html(news["kr_society"],  "tag-soc", "🟠 사회")}
+  {articles_html(news["kr_sports"],   "tag-spt", "🔵 스포츠")}
 
-  <!-- ===== ENGLISH ===== -->
-  <div class="lang-header"><span>&#127482;&#127480; English Section</span></div>
+  <!-- KR 마켓 뉴스 -->
+  {articles_html(news["kr_market_news"], "tag-mkt", "📈 증시 뉴스")}
+  {kr_mkt_table}
+  {articles_html(news["kr_crypto_news"], "tag-cry", "🟣 크립토 &amp; 스테이블코인")}
 
-  <!-- 1. U.S. News -->
-  <div class="major-section">
-    <div class="major-title">1&#47; Today&#39;s U.S. News</div>
-    {sub_section("&#128202; Politics", "sub-politics", news["en_politics"])}
-    {sub_section("&#128200; Economy", "sub-economy",   news["en_economy"])}
-    {sub_section("&#127760; Society &amp; Sports", "sub-sports", news["en_society"])}
-  </div>
+  <!-- KR 법률 -->
+  {articles_html(news["kr_legal"], "tag-leg", "⚖️ 법률")}
 
-  <!-- 2. Markets & Crypto -->
-  <div class="major-section">
-    <div class="major-title">2&#47; Markets &amp; Crypto</div>
-    {sub_section("&#128308; Stock Market Overview", "sub-market", news["en_market"], "stock")}
-    {sub_section("&#128269; Individual Stocks &amp; Sectors", "sub-stocks", news["en_stocks"], "stock")}
-    {sub_section("&#129689; Crypto &amp; Stablecoins", "sub-crypto", news["en_crypto"], "crypto")}
-  </div>
+  <!-- ════════ 🇺🇸 ENGLISH SECTION ════════ -->
+  <div class="lang-div"><span>🇺🇸 English Section</span></div>
 
-  <!-- 3. Legal & BAR -->
-  <div class="major-section" style="border-bottom:none">
-    <div class="major-title">3&#47; Legal &amp; BAR Exam</div>
-    {sub_section("&#9878; U.S. Legal News", "sub-legal", news["en_legal"])}
-    {sub_section("&#128221; BAR Exam Resources", "sub-bar", news["en_bar"])}
-  </div>
+  {articles_html(news["en_politics"],    "tag-pol", "🔴 Politics")}
+  {articles_html(news["en_economy"],     "tag-eco", "🟢 Economy")}
+  {articles_html(news["en_society"],     "tag-spt", "🔵 Society &amp; Sports")}
 
+  <!-- US 마켓 뉴스 + 테이블 -->
+  {articles_html(news["en_market_news"], "tag-mkt", "📈 Market News")}
+  {us_mkt_table}
+  {articles_html(news["en_crypto_news"], "tag-cry", "🟣 Crypto &amp; Stablecoins")}
+
+  <!-- US 법률 -->
+  {articles_html(news["en_legal"], "tag-leg", "⚖️ U.S. Legal News")}
+  {articles_html(news["en_bar"],   "tag-bar", "📚 BAR Exam")}
+
+  <!-- ── FOOTER ────────────────────────────────── -->
   <div class="footer">
-    Daily News Briefing &nbsp;|&nbsp; {DATE_STR}<br>
-    Sent to: {", ".join(TO_EMAILS)}
+    <p style="color:#8892b0;font-size:13px;font-weight:700">Daily News Update</p>
+    <p>Sent to: {", ".join(TO_EMAILS)}</p>
+    <p>{DATE_KR}</p>
   </div>
-</div>
+
+</div><!-- /card -->
+</div><!-- /shell -->
 </body>
 </html>"""
 
@@ -326,9 +428,9 @@ def send_email(subject: str, html: str) -> None:
     print(f"  FROM : {FROM_EMAIL}")
     print(f"  TO   : {TO_EMAILS}")
     payload = {"from": FROM_EMAIL, "to": TO_EMAILS, "subject": subject, "html": html}
-    data = json.dumps(payload).encode()
     req = urllib.request.Request(
-        "https://api.resend.com/emails", data=data,
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode(),
         headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
@@ -350,23 +452,31 @@ def send_email(subject: str, html: str) -> None:
 # ─── 메인 ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"=== Daily News Briefing — {DATE_STR} ===\n")
+    print(f"=== Daily News Briefing — {DATE_KR} ===\n")
 
-    STOCK_SECTIONS = {"kr_stocks", "en_stocks"}
-    sections = list(FEEDS.keys())
-    news: dict[str, list[dict]] = {}
+    # 1. 마켓 데이터
+    print("[마켓 데이터 수집]")
+    mkt = {
+        "kr_indices": fetch_prices(KR_INDICES),
+        "kr_stocks":  fetch_prices(KR_STOCKS),
+        "kr_crypto":  fetch_prices(KR_CRYPTO),
+        "us_indices": fetch_prices(US_INDICES),
+        "us_stocks":  fetch_prices(US_STOCKS),
+        "us_crypto":  fetch_prices(US_CRYPTO),
+    }
+    print()
 
-    for sec in sections:
+    # 2. 뉴스 RSS 수집
+    news = {}
+    for sec in FEEDS:
         print(f"[{sec}]")
-        if sec in STOCK_SECTIONS:
-            news[sec] = collect_stocks(sec, limit=5)
-        else:
-            news[sec] = collect(sec)
+        news[sec] = collect(sec)
         print(f"  → {len(news[sec])}개\n")
 
+    # 3. HTML 빌드 + 발송
     print("HTML 빌드 중...")
-    html = build_html(news)
+    html = build_html(news, mkt)
 
-    subject = f"📰 Daily News Briefing — {DATE_STR}"
+    subject = f"📰 Daily News Briefing — {DATE_KR}"
     print(f"\n발송: {subject}")
     send_email(subject, html)
