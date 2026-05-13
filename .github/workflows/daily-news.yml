@@ -31,6 +31,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Test Resend API connectivity
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          echo "=== curl test ===" >> /tmp/briefing.log
+          curl -sv -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"from":"onboarding@resend.dev","to":["sergeykwon@gmail.com"],"subject":"test","text":"test"}' \
+            2>&1 | tail -30 >> /tmp/briefing.log || true
+
       - name: Run news briefing
         id: run
         env:
@@ -39,7 +50,7 @@ jobs:
           TO_OVERRIDE: ${{ github.event.inputs.to_override }}
         run: |
           set -o pipefail
-          python -u news_briefing.py 2>&1 | tee /tmp/briefing.log
+          python -u news_briefing.py 2>&1 | tee -a /tmp/briefing.log
 
       - name: Commit log to repo
         if: always()
