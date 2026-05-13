@@ -299,20 +299,18 @@ def mkt_row_html(item: dict) -> str:
       <div class="mkt-chg"><span class="badge {badge_cls}">{item["change"]}</span></div>
     </div>"""
 
-def market_table_html(title: str, indices: list, stocks: list, crypto: list, note: str = "") -> str:
-    idx_rows   = "".join(mkt_row_html(i) for i in indices)
-    stk_rows   = "".join(mkt_row_html(i) for i in stocks)
-    cry_rows   = "".join(mkt_row_html(i) for i in crypto)
-    note_html  = f'<div class="mkt-note">* {note}</div>' if note else ""
+def market_table_html(title: str, sections: list[tuple[str, list]], note: str = "") -> str:
+    inner = ""
+    for subheader, items in sections:
+        if not items:
+            continue
+        rows = "".join(mkt_row_html(i) for i in items)
+        inner += f'<div class="mkt-subheader">{subheader}</div>{rows}'
+    note_html = f'<div class="mkt-note">* {note}</div>' if note else ""
     return f"""
   <div class="mkt-box">
     <div class="mkt-header">📊 {title}</div>
-    <div class="mkt-subheader">주요 지수 / Key Indices</div>
-    {idx_rows}
-    <div class="mkt-subheader">주요 종목 / Stocks</div>
-    {stk_rows}
-    <div class="mkt-subheader">크립토 / Crypto</div>
-    {cry_rows}
+    {inner}
     {note_html}
   </div>"""
 
@@ -341,11 +339,23 @@ def build_html(news: dict, mkt: dict) -> str:
     us_cry  = mkt.get("us_crypto",  [])
 
     kr_mkt_table = market_table_html(
-        "국내외 마켓 데이터", kr_idx, kr_stk, kr_cry,
+        "국내외 마켓 데이터",
+        [
+            ("국내 지수 / Korea Indices", kr_idx),
+            ("국내 종목 / Korea Stocks",  kr_stk),
+            ("해외 지수 / U.S. Indices",  us_idx),
+            ("해외 종목 / U.S. Stocks",   us_stk),
+            ("크립토 / Crypto",            kr_cry),
+        ],
         "Data by Yahoo Finance. 장 마감 기준.")
 
     us_mkt_table = market_table_html(
-        "U.S. Markets & Stocks", us_idx, us_stk, us_cry,
+        "U.S. Markets & Stocks",
+        [
+            ("주요 지수 / Key Indices", us_idx),
+            ("주요 종목 / Stocks",      us_stk),
+            ("크립토 / Crypto",         us_cry),
+        ],
         "Data provided by Yahoo Finance. As of market close.")
 
     return f"""<!DOCTYPE html>
