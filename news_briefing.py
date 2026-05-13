@@ -65,17 +65,17 @@ FEEDS = {
         ("팍스넷",            "https://paxnet.co.kr/rss/news.xml",          4),
     ],
     "kr_crypto": [
-        ("코인데스크코리아",   "https://www.coindeskkorea.com/feed/",        4),
         ("토큰포스트",         "https://tokenpost.kr/rss",                   4),
         ("블록미디어",         "https://www.blockmedia.co.kr/feed",          4),
-        ("디센터",            "https://decenter.kr/rss",                    3),
+        ("디센터",            "https://decenter.kr/rss",                    4),
+        ("코인리더스",         "https://coinreaders.com/rss",                3),
     ],
 
     # ── 국내 법률 ─────────────────────────────────────────────────────────────
     "kr_legal": [
         ("법률신문",          "https://www.lawtimes.co.kr/api/rss",         3),
-        ("법률저널",          "https://www.lec.co.kr/rss/allNews.xml",      3),
-        ("로앤비 판례",        "https://www.lawnb.com/Info/RssFeed",         3),
+        ("헤럴드 법률",        "https://biz.heraldcorp.com/rss/010000000000.xml", 3),
+        ("한국경제 법률",      "https://www.hankyung.com/feed/society",      3),
     ],
 
     # ── 미국 뉴스 ─────────────────────────────────────────────────────────────
@@ -85,28 +85,26 @@ FEEDS = {
         ("Reuters Politics",  "https://feeds.reuters.com/Reuters/PoliticsNews", 3),
     ],
     "en_economy": [
-        ("Yahoo Finance",     "https://finance.yahoo.com/news/rssindex",    3),
         ("CNBC Economy",      "https://www.cnbc.com/id/20910258/device/rss/rss.html", 3),
-        ("Reuters Business",  "https://feeds.reuters.com/reuters/businessNews", 3),
+        ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 3),
+        ("NPR Economy",       "https://feeds.npr.org/1006/rss.xml",         3),
     ],
     "en_society": [
-        ("AP News",           "https://rsshub.app/apnews/topics/apf-topnews", 3),
-        ("Reuters World",     "https://feeds.reuters.com/reuters/worldNews", 3),
+        ("BBC World",         "https://feeds.bbci.co.uk/news/world/rss.xml",3),
         ("ESPN",              "https://www.espn.com/espn/rss/news",         3),
+        ("NPR World",         "https://feeds.npr.org/1004/rss.xml",         3),
     ],
 
     # ── 미국 주식/크립토 ──────────────────────────────────────────────────────
     "en_market": [
-        ("Yahoo Finance",     "https://finance.yahoo.com/news/rssindex",    4),
-        ("CNBC Markets",      "https://www.cnbc.com/id/100003114/device/rss/rss.html", 4),
         ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 4),
-        ("Seeking Alpha",     "https://seekingalpha.com/market_currents.xml", 3),
+        ("CNBC Markets",      "https://www.cnbc.com/id/100003114/device/rss/rss.html", 4),
+        ("Investopedia",      "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline", 3),
     ],
     "en_stocks": [
-        ("Yahoo Finance",     "https://finance.yahoo.com/news/rssindex",    5),
         ("Motley Fool",       "https://www.fool.com/feeds/index.aspx",      5),
+        ("MarketWatch",       "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/", 5),
         ("Investopedia",      "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline", 4),
-        ("Barron's",          "https://www.barrons.com/feed/rss/wsj-com-all", 4),
     ],
     "en_crypto": [
         ("CoinDesk",          "https://www.coindesk.com/arc/outboundfeeds/rss/", 4),
