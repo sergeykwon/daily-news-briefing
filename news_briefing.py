@@ -20,7 +20,8 @@ except ImportError:
 
 RESEND_API_KEY = os.environ["RESEND_API_KEY"]
 FROM_EMAIL     = os.environ.get("FROM_EMAIL", "onboarding@resend.dev")
-TO_EMAILS      = ["cmkim0316@gmail.com", "sergeykwon@gmail.com"]
+_to_override   = os.environ.get("TO_OVERRIDE", "").strip()
+TO_EMAILS      = [_to_override] if _to_override else ["cmkim0316@gmail.com", "sergeykwon@gmail.com"]
 
 KST = timezone(timedelta(hours=9))
 NOW = datetime.now(KST)
