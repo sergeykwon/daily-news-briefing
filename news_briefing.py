@@ -33,21 +33,21 @@ DATE_STR = NOW.strftime("%Y년 %m월 %d일 (%a)").replace(
 
 FEEDS = {
     "kr_general": [
-        ("연합뉴스",    "https://www.yonhapnews.co.kr/rss/headline.xml"),
-        ("경향신문",    "https://www.khan.co.kr/rss/rssdata/khnNews.xml"),
-        ("MBC 뉴스",   "https://imnews.imbc.com/rss/news/news_00.xml"),
-        ("VOA 한국어", "https://www.voakorea.com/api/z_mgkpqk-revu"),
+        ("연합뉴스",  "https://www.yonhapnewstv.co.kr/feed/"),
+        ("KBS 뉴스",  "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS"),
+        ("SBS 뉴스",  "https://news.sbs.co.kr/news/rss/rss.do?pNo=00&menuTypeCd=RECENT"),
+        ("조선일보",  "https://www.chosun.com/arc/outboundfeeds/rss/"),
     ],
     "kr_stock": [
-        ("한국경제",   "https://feeds.hankyung.com/apps/news.rss?category=0301"),
+        ("한국경제",   "https://www.hankyung.com/feed/all-news"),
         ("매일경제",   "https://www.mk.co.kr/rss/30100061/"),
-        ("머니투데이", "https://www.mt.co.kr/rss/economy.xml"),
-        ("서울경제",   "https://www.sedaily.com/RssService/SedailyRss.xml"),
+        ("이데일리",   "https://www.edaily.co.kr/rss/economy.xml"),
+        ("KBS 경제",  "https://news.kbs.co.kr/rss/rss.do?source=NETWORK_NEWS&category=economy"),
     ],
     "kr_legal": [
         ("법률신문",   "https://www.lawtimes.co.kr/api/rss"),
         ("법률저널",   "https://www.lec.co.kr/rss/allNews.xml"),
-        ("로앤비",     "https://www.lawnb.com/Info/RssFeed"),
+        ("헤럴드법률", "https://biz.heraldcorp.com/rss/010000000000.xml"),
     ],
     "en_politics": [
         ("NPR Politics",  "https://feeds.npr.org/1001/rss.xml"),
