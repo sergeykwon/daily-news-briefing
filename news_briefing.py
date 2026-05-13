@@ -209,8 +209,8 @@ def fetch_feed(name: str, url: str, max_items: int) -> list[dict]:
         for entry in feed.entries[:max_items]:
             title   = strip_tags(entry.get("title", "")).strip()
             summary = strip_tags(entry.get("summary") or entry.get("description", ""))
-            if len(summary) > 260:
-                summary = summary[:260] + "…"
+            if len(summary) > 150:
+                summary = summary[:150] + "…"
             link = entry.get("link", url)
             if title:
                 items.append({"headline": title, "summary": summary, "url": link})
@@ -231,59 +231,68 @@ def collect(section: str, limit: int = 4) -> list[dict]:
 # ─── HTML 컴포넌트 ─────────────────────────────────────────────────────────────
 
 CSS = """<style>
-body{margin:0;padding:0;background:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
-.shell{max-width:640px;margin:0 auto;background:#f0f0f0}
-.topbar{background:#f0f0f0;padding:8px 20px;text-align:center;font-size:11px;color:#888}
-.card{background:#fff;margin:0;padding:0}
+body{margin:0;padding:0;background:#e8e8e8;font-family:Arial,Helvetica,sans-serif}
+.shell{max-width:600px;margin:0 auto;background:#e8e8e8}
+.topbar{background:#1a1a2e;padding:8px 24px;text-align:center;font-size:10px;color:#8892b0;letter-spacing:.8px;text-transform:uppercase}
+.card{background:#fff}
 /* Header */
-.hdr{background:#1a1a2e;padding:28px 32px 22px}
-.hdr-title{color:#fff;font-size:26px;font-weight:800;letter-spacing:-0.5px;margin:0 0 4px}
-.hdr-sub{color:#8892b0;font-size:13px;margin:0}
+.hdr{background:#1a1a2e;padding:26px 32px 20px;border-bottom:4px solid #f5c518}
+.hdr-eyebrow{color:#f5c518;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 8px}
+.hdr-title{color:#fff;font-size:30px;font-weight:900;letter-spacing:-1px;margin:0 0 4px;line-height:1.1;font-family:Georgia,serif}
+.hdr-sub{color:#6b7a99;font-size:12px;margin:0;letter-spacing:.3px}
 /* TOC */
-.toc{background:#f8f9fc;border-bottom:2px solid #e8ecf8;padding:14px 32px}
-.toc-title{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
-.toc-item{font-size:13px;color:#1a237e;line-height:2;display:block;text-decoration:none}
-/* Lang divider */
-.lang-div{background:#1a1a2e;padding:10px 32px}
-.lang-div span{color:#90caf9;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.toc{background:#f7f7f7;border-bottom:1px solid #e2e2e2;padding:14px 32px}
+.toc-title{font-size:9px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 10px}
+.toc-grid{display:block}
+.toc-item{font-size:12px;color:#1a1a2e;line-height:2.1;display:block;font-weight:600}
+.toc-item:before{content:"→  "}
+/* Lang banner */
+.lang-div{background:#1a1a2e;padding:9px 32px;border-top:2px solid #f5c518}
+.lang-div span{color:#f5c518;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
 /* Section */
-.section{padding:22px 32px;border-bottom:1px solid #eee}
-.cat-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:3px 10px;border-radius:3px;margin-bottom:12px}
-.tag-pol{background:#fce4ec;color:#b71c1c}
-.tag-eco{background:#e8f5e9;color:#1b5e20}
-.tag-soc{background:#fff3e0;color:#e65100}
-.tag-spt{background:#e3f2fd;color:#0d47a1}
-.tag-mkt{background:#e8f5e9;color:#1b5e20}
-.tag-cry{background:#ede7f6;color:#4527a0}
-.tag-leg{background:#fff8e1;color:#f57f17}
-.tag-bar{background:#e0f2f1;color:#004d40}
-/* Article */
-.art{margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed #eee}
-.art:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.art-hl{font-size:14px;font-weight:700;color:#1a1a2e;margin:0 0 5px;line-height:1.4}
-.art-sum{font-size:13px;color:#555;line-height:1.65;margin:0 0 6px}
-.art-link{font-size:12px;color:#1565c0;text-decoration:none;font-weight:600}
-.art-link:hover{text-decoration:underline}
+.section{padding:22px 32px;border-bottom:1px solid #ebebeb}
+/* Category label — small all-caps with colored underline */
+.cat-label{display:inline-block;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin:0 0 14px;padding-bottom:5px;border-bottom:2.5px solid currentColor}
+.lbl-pol{color:#c62828}
+.lbl-eco{color:#2e7d32}
+.lbl-soc{color:#e65100}
+.lbl-spt{color:#1565c0}
+.lbl-mkt{color:#1b5e20}
+.lbl-cry{color:#4527a0}
+.lbl-leg{color:#f57f17}
+.lbl-bar{color:#00695c}
+/* Main article */
+.art-hl{font-size:19px;font-weight:900;color:#111;line-height:1.25;margin:0 0 9px;font-family:Georgia,serif}
+.art-sum{font-size:14px;color:#444;line-height:1.75;margin:0 0 9px}
+.art-link{font-size:12px;color:#1565c0;text-decoration:none;font-weight:700;letter-spacing:.2px}
+.art-divider{border:none;border-top:1px solid #ebebeb;margin:18px 0}
+/* Quick-hit bullets */
+.hits-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#888;margin:18px 0 10px;padding-top:2px}
+.hit{display:flex;margin-bottom:9px;font-size:13px;line-height:1.6;align-items:flex-start}
+.hit-dot{color:#f5c518;font-weight:900;margin-right:8px;flex-shrink:0;font-size:14px;line-height:1.55}
+.hit-text{color:#444}
+.hit-text a{color:#1565c0;text-decoration:none;font-weight:600}
 /* Market table */
-.mkt-box{margin:0 32px 22px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
-.mkt-header{background:#1a237e;color:#fff;padding:10px 16px;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
-.mkt-subheader{background:#f0f4ff;padding:7px 16px;font-size:11px;font-weight:700;color:#1a237e;letter-spacing:.5px;border-top:1px solid #dde2f5;border-bottom:1px solid #dde2f5}
-.mkt-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #f5f5f5;font-size:13px}
+.mkt-wrap{padding:0 32px 24px}
+.mkt-box{border:1px solid #ddd;border-radius:6px;overflow:hidden;font-size:13px}
+.mkt-header{background:#1a237e;color:#fff;padding:10px 16px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.mkt-subheader{background:#f0f4ff;padding:6px 16px;font-size:9px;font-weight:800;color:#3949ab;letter-spacing:1px;text-transform:uppercase;border-top:1px solid #dde4f5;border-bottom:1px solid #dde4f5}
+.mkt-row{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid #f2f2f2}
 .mkt-row:last-child{border-bottom:none}
-.mkt-arrow{width:18px;font-size:11px}
-.mkt-arrow.up{color:#2e7d32}
-.mkt-arrow.dn{color:#c62828}
-.mkt-name{flex:1;color:#333;font-weight:500}
-.mkt-sym{font-size:10px;color:#999;margin-left:5px}
-.mkt-price{font-weight:700;color:#1a1a2e;min-width:100px;text-align:right}
-.mkt-chg{min-width:90px;text-align:right}
-.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11.5px;font-weight:700}
+.mkt-arrow{width:16px;font-size:10px;flex-shrink:0}
+.mkt-arrow.up{color:#2e7d32}.mkt-arrow.dn{color:#c62828}
+.mkt-name{flex:1;color:#222;font-weight:600}
+.mkt-sym{font-size:9px;color:#bbb;margin-left:4px;font-weight:400}
+.mkt-price{font-weight:700;color:#111;min-width:90px;text-align:right}
+.mkt-chg{min-width:80px;text-align:right}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
 .badge.up{background:#e8f5e9;color:#1b5e20}
 .badge.dn{background:#ffebee;color:#b71c1c}
-.mkt-note{padding:8px 16px;font-size:10px;color:#999;background:#fafafa;border-top:1px solid #f0f0f0}
+.mkt-note{padding:7px 16px;font-size:10px;color:#bbb;background:#fafafa}
 /* Footer */
-.footer{background:#1a1a2e;padding:20px 32px;text-align:center}
-.footer p{color:#555;font-size:11px;margin:4px 0}
+.footer{background:#1a1a2e;padding:22px 32px;text-align:center}
+.footer-brand{color:#f5c518;font-size:13px;font-weight:800;letter-spacing:.5px;margin:0 0 6px}
+.footer p{color:#5a6270;font-size:11px;margin:3px 0;letter-spacing:.2px}
 </style>"""
 
 def mkt_row_html(item: dict) -> str:
@@ -308,26 +317,43 @@ def market_table_html(title: str, sections: list[tuple[str, list]], note: str = 
         inner += f'<div class="mkt-subheader">{subheader}</div>{rows}'
     note_html = f'<div class="mkt-note">* {note}</div>' if note else ""
     return f"""
-  <div class="mkt-box">
-    <div class="mkt-header">📊 {title}</div>
-    {inner}
-    {note_html}
+  <div class="mkt-wrap">
+    <div class="mkt-box">
+      <div class="mkt-header">📊 {title}</div>
+      {inner}
+      {note_html}
+    </div>
   </div>"""
 
-def articles_html(items: list, tag_cls: str, tag_label: str) -> str:
+def articles_html(items: list, lbl_cls: str, lbl_label: str) -> str:
+    full = items[:2]
+    hits = items[2:]
+
     if not items:
-        arts = '<div class="art"><p class="art-sum">뉴스를 가져오지 못했습니다.</p></div>'
+        body = '<p style="font-size:13px;color:#aaa;margin:0">뉴스를 가져오지 못했습니다.</p>'
     else:
-        arts = "".join(f"""
-    <div class="art">
-      <div class="art-hl">{i['headline'].replace('<','&lt;').replace('>','&gt;')}</div>
-      <div class="art-sum">{i['summary'].replace('<','&lt;').replace('>','&gt;')}</div>
-      <a href="{i['url']}" class="art-link">Continue reading →</a>
-    </div>""" for i in items)
+        parts = []
+        for idx, i in enumerate(full):
+            if idx > 0:
+                parts.append('<hr class="art-divider">')
+            hl = i['headline'].replace('<','&lt;').replace('>','&gt;')
+            sm = i['summary'].replace('<','&lt;').replace('>','&gt;')
+            parts.append(f'<div class="art-hl">{hl}</div>'
+                         f'<div class="art-sum">{sm}</div>'
+                         f'<a href="{i["url"]}" class="art-link">Continue reading →</a>')
+        if hits:
+            hit_items = "".join(
+                f'<div class="hit"><span class="hit-dot">◆</span>'
+                f'<span class="hit-text"><a href="{h["url"]}">'
+                f'{h["headline"].replace("<","&lt;").replace(">","&gt;")}</a></span></div>'
+                for h in hits)
+            parts.append(f'<div class="hits-label">More stories</div>{hit_items}')
+        body = "\n".join(parts)
+
     return f"""
   <div class="section">
-    <span class="cat-tag {tag_cls}">{tag_label}</span>
-    {arts}
+    <div class="cat-label {lbl_cls}">{lbl_label}</div>
+    {body}
   </div>"""
 
 def build_html(news: dict, mkt: dict) -> str:
@@ -374,57 +400,52 @@ def build_html(news: dict, mkt: dict) -> str:
 
   <!-- ── HEADER ──────────────────────────────────── -->
   <div class="hdr">
-    <div class="hdr-title">📰 Daily News Briefing</div>
-    <div class="hdr-sub">{DATE_KR} &nbsp;|&nbsp; 🇰🇷 한국어 + 🇺🇸 English</div>
+    <div class="hdr-eyebrow">Daily News Update</div>
+    <div class="hdr-title">Daily Briefing</div>
+    <div class="hdr-sub">{DATE_KR} &nbsp;·&nbsp; 🇰🇷 한국어 + 🇺🇸 English</div>
   </div>
 
   <!-- ── TOC ─────────────────────────────────────── -->
   <div class="toc">
     <div class="toc-title">In today's edition</div>
-    <span class="toc-item">🇰🇷 오늘의 국내 주요 뉴스 — 정치 · 경제 · 사회 · 스포츠</span>
-    <span class="toc-item">📈 국내외 주식 &amp; 크립토 마켓</span>
-    <span class="toc-item">🇺🇸 Today's U.S. News — Politics · Economy · Society &amp; Sports</span>
-    <span class="toc-item">📊 U.S. Markets, Stocks &amp; Crypto</span>
+    <span class="toc-item">🇰🇷 오늘의 국내 뉴스 — 정치 · 경제 · 사회 · 스포츠</span>
+    <span class="toc-item">📈 국내외 마켓 데이터 &amp; 증시 · 크립토</span>
+    <span class="toc-item">🇺🇸 U.S. News — Politics · Economy · Society</span>
+    <span class="toc-item">📊 U.S. Markets &amp; Crypto</span>
     <span class="toc-item">⚖️ Legal News &amp; BAR Exam</span>
   </div>
 
   <!-- ════════ 🇰🇷 KOREAN SECTION ════════ -->
   <div class="lang-div"><span>🇰🇷 한국어 섹션</span></div>
 
-  {articles_html(news["kr_politics"], "tag-pol", "🔴 정치")}
-  {articles_html(news["kr_economy"],  "tag-eco", "🟢 경제")}
-  {articles_html(news["kr_society"],  "tag-soc", "🟠 사회")}
-  {articles_html(news["kr_sports"],   "tag-spt", "🔵 스포츠")}
+  {articles_html(news["kr_politics"], "lbl-pol", "정치")}
+  {articles_html(news["kr_economy"],  "lbl-eco", "경제")}
+  {articles_html(news["kr_society"],  "lbl-soc", "사회")}
+  {articles_html(news["kr_sports"],   "lbl-spt", "스포츠")}
 
-  <!-- KR 마켓 뉴스 -->
-  {articles_html(news["kr_market_news"], "tag-mkt", "📈 증시 뉴스")}
+  {articles_html(news["kr_market_news"], "lbl-mkt", "증시 뉴스")}
   {kr_mkt_table}
-  {articles_html(news["kr_crypto_news"], "tag-cry", "🟣 크립토 &amp; 스테이블코인")}
-
-  <!-- KR 법률 -->
-  {articles_html(news["kr_legal"], "tag-leg", "⚖️ 법률")}
+  {articles_html(news["kr_crypto_news"], "lbl-cry", "크립토 &amp; 스테이블코인")}
+  {articles_html(news["kr_legal"], "lbl-leg", "법률")}
 
   <!-- ════════ 🇺🇸 ENGLISH SECTION ════════ -->
   <div class="lang-div"><span>🇺🇸 English Section</span></div>
 
-  {articles_html(news["en_politics"],    "tag-pol", "🔴 Politics")}
-  {articles_html(news["en_economy"],     "tag-eco", "🟢 Economy")}
-  {articles_html(news["en_society"],     "tag-spt", "🔵 Society &amp; Sports")}
+  {articles_html(news["en_politics"],    "lbl-pol", "Politics")}
+  {articles_html(news["en_economy"],     "lbl-eco", "Economy")}
+  {articles_html(news["en_society"],     "lbl-spt", "Society &amp; Sports")}
 
-  <!-- US 마켓 뉴스 + 테이블 -->
-  {articles_html(news["en_market_news"], "tag-mkt", "📈 Market News")}
+  {articles_html(news["en_market_news"], "lbl-mkt", "Market News")}
   {us_mkt_table}
-  {articles_html(news["en_crypto_news"], "tag-cry", "🟣 Crypto &amp; Stablecoins")}
-
-  <!-- US 법률 -->
-  {articles_html(news["en_legal"], "tag-leg", "⚖️ U.S. Legal News")}
-  {articles_html(news["en_bar"],   "tag-bar", "📚 BAR Exam")}
+  {articles_html(news["en_crypto_news"], "lbl-cry", "Crypto &amp; Stablecoins")}
+  {articles_html(news["en_legal"], "lbl-leg", "U.S. Legal News")}
+  {articles_html(news["en_bar"],   "lbl-bar", "BAR Exam")}
 
   <!-- ── FOOTER ────────────────────────────────── -->
   <div class="footer">
-    <p style="color:#8892b0;font-size:13px;font-weight:700">Daily News Update</p>
-    <p>Sent to: {", ".join(TO_EMAILS)}</p>
+    <div class="footer-brand">Daily News Update</div>
     <p>{DATE_KR}</p>
+    <p>Sent to: {", ".join(TO_EMAILS)}</p>
   </div>
 
 </div><!-- /card -->
