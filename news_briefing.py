@@ -203,6 +203,9 @@ def build_html(news: dict[str, list[dict]]) -> str:
 # ─── 이메일 발송 ───────────────────────────────────────────────────────────────
 
 def send_email(subject: str, html: str) -> None:
+    import sys
+    print(f"  FROM : {FROM_EMAIL}")
+    print(f"  TO   : {TO_EMAILS}")
     payload = {
         "from": FROM_EMAIL,
         "to": TO_EMAILS,
@@ -225,11 +228,11 @@ def send_email(subject: str, html: str) -> None:
             print(f"✅ 발송 완료! id={json.loads(body).get('id')}")
     except urllib.error.HTTPError as e:
         body = e.read().decode()
-        print(f"❌ Resend 오류 {e.code}: {body}")
-        raise
+        print(f"❌ Resend HTTP {e.code}: {body}")
+        sys.exit(1)
     except Exception as e:
-        print(f"❌ 네트워크 오류: {e}")
-        raise
+        print(f"❌ 네트워크 오류: {type(e).__name__}: {e}")
+        sys.exit(1)
 
 # ─── 메인 ─────────────────────────────────────────────────────────────────────
 
