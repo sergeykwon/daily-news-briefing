@@ -231,68 +231,71 @@ def collect(section: str, limit: int = 4) -> list[dict]:
 # ─── HTML 컴포넌트 ─────────────────────────────────────────────────────────────
 
 CSS = """<style>
-body{margin:0;padding:0;background:#e8e8e8;font-family:Arial,Helvetica,sans-serif}
-.shell{max-width:600px;margin:0 auto;background:#e8e8e8}
-.topbar{background:#1a1a2e;padding:8px 24px;text-align:center;font-size:10px;color:#8892b0;letter-spacing:.8px;text-transform:uppercase}
+body{margin:0;padding:0;background:#f5f3ff;font-family:'Segoe UI',Arial,Helvetica,sans-serif}
+.shell{max-width:600px;margin:0 auto;background:#f5f3ff}
 .card{background:#fff}
-/* Header */
-.hdr{background:#1a1a2e;padding:26px 32px 20px;border-bottom:4px solid #f5c518}
-.hdr-eyebrow{color:#f5c518;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 8px}
-.hdr-title{color:#fff;font-size:30px;font-weight:900;letter-spacing:-1px;margin:0 0 4px;line-height:1.1;font-family:Georgia,serif}
-.hdr-sub{color:#6b7a99;font-size:12px;margin:0;letter-spacing:.3px}
+/* Topbar */
+.topbar{background:#4c1d95;padding:8px 24px;text-align:center;font-size:10px;color:#c4b5fd;letter-spacing:1px;text-transform:uppercase}
+/* Hero Header */
+.hdr{background:linear-gradient(135deg,#3b0764 0%,#6d28d9 55%,#a855f7 100%);padding:40px 32px 36px;text-align:center}
+.hdr-eyebrow{display:inline-block;background:rgba(255,255,255,.15);color:#e9d5ff;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin:0 0 16px}
+.hdr-title{color:#fff;font-size:34px;font-weight:900;line-height:1.15;margin:0 0 10px;font-family:Georgia,serif}
+.hdr-sub{color:#ddd6fe;font-size:13px;margin:0 0 22px}
+.hdr-badge{display:inline-block;background:#fff;color:#6d28d9;font-size:11px;font-weight:800;padding:9px 22px;border-radius:24px;letter-spacing:.5px}
 /* TOC */
-.toc{background:#f7f7f7;border-bottom:1px solid #e2e2e2;padding:14px 32px}
-.toc-title{font-size:9px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 10px}
-.toc-grid{display:block}
-.toc-item{font-size:12px;color:#1a1a2e;line-height:2.1;display:block;font-weight:600}
-.toc-item:before{content:"→  "}
+.toc{background:#fff;padding:20px 24px;border-bottom:1px solid #f0e7ff}
+.toc-title{font-size:9px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px}
+.toc-item{display:flex;align-items:center;padding:9px 14px;margin-bottom:6px;background:#faf7ff;border-radius:10px;border-left:3px solid #7c3aed}
+.toc-ico{font-size:15px;margin-right:10px;flex-shrink:0}
+.toc-txt{flex:1;font-size:13px;color:#1e1b4b;font-weight:600}
+.toc-arr{color:#a78bfa;font-size:13px;font-weight:700}
 /* Lang banner */
-.lang-div{background:#1a1a2e;padding:9px 32px;border-top:2px solid #f5c518}
-.lang-div span{color:#f5c518;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.lang-div{background:linear-gradient(90deg,#4c1d95,#7c3aed);padding:10px 24px}
+.lang-div span{color:#fff;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
 /* Section */
-.section{padding:22px 32px;border-bottom:1px solid #ebebeb}
-/* Category label — small all-caps with colored underline */
-.cat-label{display:inline-block;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin:0 0 14px;padding-bottom:5px;border-bottom:2.5px solid currentColor}
-.lbl-pol{color:#c62828}
-.lbl-eco{color:#2e7d32}
-.lbl-soc{color:#e65100}
-.lbl-spt{color:#1565c0}
-.lbl-mkt{color:#1b5e20}
-.lbl-cry{color:#4527a0}
-.lbl-leg{color:#f57f17}
-.lbl-bar{color:#00695c}
-/* Main article */
-.art-hl{font-size:19px;font-weight:900;color:#111;line-height:1.25;margin:0 0 9px;font-family:Georgia,serif}
-.art-sum{font-size:14px;color:#444;line-height:1.75;margin:0 0 9px}
-.art-link{font-size:12px;color:#1565c0;text-decoration:none;font-weight:700;letter-spacing:.2px}
-.art-divider{border:none;border-top:1px solid #ebebeb;margin:18px 0}
-/* Quick-hit bullets */
-.hits-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#888;margin:18px 0 10px;padding-top:2px}
+.section{background:#fff;padding:22px 24px;border-bottom:1px solid #f3f0ff}
+/* Category pill */
+.cat-label{display:inline-block;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin:0 0 14px}
+.lbl-pol{background:#fee2e2;color:#991b1b}
+.lbl-eco{background:#d1fae5;color:#065f46}
+.lbl-soc{background:#ffedd5;color:#9a3412}
+.lbl-spt{background:#dbeafe;color:#1e40af}
+.lbl-mkt{background:#ede9fe;color:#5b21b6}
+.lbl-cry{background:#f3e8ff;color:#7e22ce}
+.lbl-leg{background:#fef9c3;color:#854d0e}
+.lbl-bar{background:#ccfbf1;color:#115e59}
+/* Article */
+.art-hl{font-size:20px;font-weight:900;color:#1e1b4b;line-height:1.25;margin:0 0 9px;font-family:Georgia,serif}
+.art-sum{font-size:14px;color:#4b5563;line-height:1.75;margin:0 0 12px}
+.art-btn{display:inline-block;background:#7c3aed;color:#fff;font-size:12px;font-weight:700;padding:9px 20px;border-radius:22px;text-decoration:none;letter-spacing:.3px}
+.art-divider{border:none;border-top:1px solid #f3f0ff;margin:18px 0}
+/* Quick hits */
+.hits-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;margin:18px 0 10px}
 .hit{display:flex;margin-bottom:9px;font-size:13px;line-height:1.6;align-items:flex-start}
-.hit-dot{color:#f5c518;font-weight:900;margin-right:8px;flex-shrink:0;font-size:14px;line-height:1.55}
-.hit-text{color:#444}
-.hit-text a{color:#1565c0;text-decoration:none;font-weight:600}
+.hit-dot{color:#a78bfa;font-weight:900;margin-right:8px;flex-shrink:0;font-size:14px;line-height:1.5}
+.hit-text{color:#4b5563}
+.hit-text a{color:#6d28d9;text-decoration:none;font-weight:600}
 /* Market table */
-.mkt-wrap{padding:0 32px 24px}
-.mkt-box{border:1px solid #ddd;border-radius:6px;overflow:hidden;font-size:13px}
-.mkt-header{background:#1a237e;color:#fff;padding:10px 16px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
-.mkt-subheader{background:#f0f4ff;padding:6px 16px;font-size:9px;font-weight:800;color:#3949ab;letter-spacing:1px;text-transform:uppercase;border-top:1px solid #dde4f5;border-bottom:1px solid #dde4f5}
-.mkt-row{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid #f2f2f2}
+.mkt-wrap{padding:0 24px 24px;background:#fff}
+.mkt-box{border:1px solid #ede9fe;border-radius:12px;overflow:hidden;font-size:13px}
+.mkt-header{background:linear-gradient(90deg,#4c1d95,#7c3aed);color:#fff;padding:12px 16px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.mkt-subheader{background:#faf7ff;padding:6px 16px;font-size:9px;font-weight:800;color:#6d28d9;letter-spacing:1px;text-transform:uppercase;border-top:1px solid #ede9fe;border-bottom:1px solid #ede9fe}
+.mkt-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid #faf7ff}
 .mkt-row:last-child{border-bottom:none}
 .mkt-arrow{width:16px;font-size:10px;flex-shrink:0}
-.mkt-arrow.up{color:#2e7d32}.mkt-arrow.dn{color:#c62828}
-.mkt-name{flex:1;color:#222;font-weight:600}
-.mkt-sym{font-size:9px;color:#bbb;margin-left:4px;font-weight:400}
+.mkt-arrow.up{color:#059669}.mkt-arrow.dn{color:#dc2626}
+.mkt-name{flex:1;color:#1e1b4b;font-weight:600}
+.mkt-sym{font-size:9px;color:#c4b5fd;margin-left:4px;font-weight:400}
 .mkt-price{font-weight:700;color:#111;min-width:90px;text-align:right}
 .mkt-chg{min-width:80px;text-align:right}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
-.badge.up{background:#e8f5e9;color:#1b5e20}
-.badge.dn{background:#ffebee;color:#b71c1c}
-.mkt-note{padding:7px 16px;font-size:10px;color:#bbb;background:#fafafa}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.badge.up{background:#d1fae5;color:#065f46}
+.badge.dn{background:#fee2e2;color:#991b1b}
+.mkt-note{padding:7px 16px;font-size:10px;color:#c4b5fd;background:#faf7ff}
 /* Footer */
-.footer{background:#1a1a2e;padding:22px 32px;text-align:center}
-.footer-brand{color:#f5c518;font-size:13px;font-weight:800;letter-spacing:.5px;margin:0 0 6px}
-.footer p{color:#5a6270;font-size:11px;margin:3px 0;letter-spacing:.2px}
+.footer{background:linear-gradient(135deg,#3b0764 0%,#6d28d9 100%);padding:28px 32px;text-align:center}
+.footer-brand{color:#fff;font-size:16px;font-weight:900;letter-spacing:.5px;margin:0 0 8px;font-family:Georgia,serif}
+.footer p{color:#c4b5fd;font-size:11px;margin:3px 0}
 </style>"""
 
 def mkt_row_html(item: dict) -> str:
@@ -340,7 +343,7 @@ def articles_html(items: list, lbl_cls: str, lbl_label: str) -> str:
             sm = i['summary'].replace('<','&lt;').replace('>','&gt;')
             parts.append(f'<div class="art-hl">{hl}</div>'
                          f'<div class="art-sum">{sm}</div>'
-                         f'<a href="{i["url"]}" class="art-link">Continue reading →</a>')
+                         f'<a href="{i["url"]}" class="art-btn">Continue reading →</a>')
         if hits:
             hit_items = "".join(
                 f'<div class="hit"><span class="hit-dot">◆</span>'
@@ -398,21 +401,22 @@ def build_html(news: dict, mkt: dict) -> str:
 
 <div class="card">
 
-  <!-- ── HEADER ──────────────────────────────────── -->
+  <!-- ── HERO HEADER ─────────────────────────────── -->
   <div class="hdr">
     <div class="hdr-eyebrow">Daily News Update</div>
-    <div class="hdr-title">Daily Briefing</div>
+    <div class="hdr-title">Your Daily Briefing</div>
     <div class="hdr-sub">{DATE_KR} &nbsp;·&nbsp; 🇰🇷 한국어 + 🇺🇸 English</div>
+    <div class="hdr-badge">오늘의 핵심 뉴스 모음</div>
   </div>
 
   <!-- ── TOC ─────────────────────────────────────── -->
   <div class="toc">
     <div class="toc-title">In today's edition</div>
-    <span class="toc-item">🇰🇷 오늘의 국내 뉴스 — 정치 · 경제 · 사회 · 스포츠</span>
-    <span class="toc-item">📈 국내외 마켓 데이터 &amp; 증시 · 크립토</span>
-    <span class="toc-item">🇺🇸 U.S. News — Politics · Economy · Society</span>
-    <span class="toc-item">📊 U.S. Markets &amp; Crypto</span>
-    <span class="toc-item">⚖️ Legal News &amp; BAR Exam</span>
+    <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt">오늘의 국내 뉴스 — 정치 · 경제 · 사회 · 스포츠</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">📈</span><span class="toc-txt">국내외 마켓 데이터 &amp; 증시 · 크립토</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt">U.S. News — Politics · Economy · Society</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">📊</span><span class="toc-txt">U.S. Markets &amp; Crypto</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">⚖️</span><span class="toc-txt">Legal News &amp; BAR Exam</span><span class="toc-arr">→</span></div>
   </div>
 
   <!-- ════════ 🇰🇷 KOREAN SECTION ════════ -->
@@ -443,9 +447,9 @@ def build_html(news: dict, mkt: dict) -> str:
 
   <!-- ── FOOTER ────────────────────────────────── -->
   <div class="footer">
-    <div class="footer-brand">Daily News Update</div>
+    <div class="footer-brand">📰 Daily News Update</div>
     <p>{DATE_KR}</p>
-    <p>Sent to: {", ".join(TO_EMAILS)}</p>
+    <p style="margin-top:8px">{", ".join(TO_EMAILS)}</p>
   </div>
 
 </div><!-- /card -->
