@@ -15,7 +15,8 @@ except ImportError:
 # ─── 설정 ─────────────────────────────────────────────────────────────────────
 
 RESEND_API_KEY = os.environ["RESEND_API_KEY"]
-FROM_EMAIL     = os.environ.get("FROM_EMAIL", "onboarding@resend.dev")
+_from_addr     = os.environ.get("FROM_EMAIL", "onboarding@resend.dev")
+FROM_EMAIL     = f"Daily News Update <{_from_addr}>"
 _to_override   = os.environ.get("TO_OVERRIDE", "").strip()
 TO_EMAILS      = [_to_override] if _to_override else ["cmkim0316@gmail.com", "sergeykwon@gmail.com"]
 
