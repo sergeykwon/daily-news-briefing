@@ -62,10 +62,8 @@ US_STOCKS = [
     ("Amazon",     "AMZN",    "stock_us"),
     ("Google",     "GOOGL",   "stock_us"),
     ("Apple",      "AAPL",    "stock_us"),
-    ("NVTS",       "NVTS",    "stock_us"),
-    ("Oracle",     "ORCL",    "stock_us"),
-    ("Intel",      "INTC",    "stock_us"),
     ("NVIDIA",     "NVDA",    "stock_us"),
+    ("Tesla",      "TSLA",    "stock_us"),
 ]
 US_CRYPTO = [
     ("Bitcoin",    "BTC-USD", "crypto"),
@@ -331,9 +329,9 @@ def market_table_html(title: str, sections: list[tuple[str, list]], note: str = 
     </div>
   </div>"""
 
-def articles_html(items: list, lbl_cls: str, lbl_label: str) -> str:
-    full = items[:2]
-    hits = items[2:]
+def articles_html(items: list, lbl_cls: str, lbl_label: str, full_count: int = 2) -> str:
+    full = items[:full_count]
+    hits = items[full_count:]
 
     if not items:
         body = '<p style="font-size:13px;color:#aaa;margin:0">뉴스를 가져오지 못했습니다.</p>'
@@ -364,31 +362,21 @@ def articles_html(items: list, lbl_cls: str, lbl_label: str) -> str:
 
 def build_html(news: dict, mkt: dict) -> str:
     kr_idx  = mkt.get("kr_indices", [])
-    kr_stk  = mkt.get("kr_stocks",  [])
     kr_cry  = mkt.get("kr_crypto",  [])
     us_idx  = mkt.get("us_indices", [])
     us_stk  = mkt.get("us_stocks",  [])
     us_cry  = mkt.get("us_crypto",  [])
 
-    kr_mkt_table = market_table_html(
-        "국내외 마켓 데이터",
+    # 통합 마켓 테이블 (상단 배치)
+    top_mkt_table = market_table_html(
+        "Market Overview",
         [
-            ("국내 지수 / Korea Indices", kr_idx),
-            ("국내 종목 / Korea Stocks",  kr_stk),
-            ("해외 지수 / U.S. Indices",  us_idx),
-            ("해외 종목 / U.S. Stocks",   us_stk),
-            ("크립토 / Crypto",            kr_cry),
+            ("국내 지수 / Korea Indices",  kr_idx),
+            ("해외 지수 / U.S. Indices",   us_idx),
+            ("주요 종목 / Key Stocks",     us_stk),
+            ("크립토 / Crypto",             us_cry),
         ],
         "Data by Yahoo Finance. 장 마감 기준.")
-
-    us_mkt_table = market_table_html(
-        "U.S. Markets & Stocks",
-        [
-            ("주요 지수 / Key Indices", us_idx),
-            ("주요 종목 / Stocks",      us_stk),
-            ("크립토 / Crypto",         us_cry),
-        ],
-        "Data provided by Yahoo Finance. As of market close.")
 
     return f"""<!DOCTYPE html>
 <html lang="ko">
@@ -415,25 +403,25 @@ def build_html(news: dict, mkt: dict) -> str:
   <!-- ── TOC ─────────────────────────────────────── -->
   <div class="toc">
     <div class="toc-title">In today's edition</div>
+    <div class="toc-item"><span class="toc-ico">📊</span><span class="toc-txt"><strong>Market Overview</strong> — 지수 · 종목 · 크립토</span><span class="toc-arr">→</span></div>
     <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt"><strong>국내 뉴스</strong> — 정치 · 경제 · 사회 · 스포츠</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt"><strong>국내외 마켓 데이터</strong> — 증시 · 크립토</span><span class="toc-arr">→</span></div>
     <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>U.S. News</strong> — Politics · Economy · Society</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>U.S. Markets</strong> — Stocks · Crypto</span><span class="toc-arr">→</span></div>
     <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>Legal News</strong> &amp; BAR Exam</span><span class="toc-arr">→</span></div>
   </div>
+
+  <!-- ════════ MARKET OVERVIEW (TOP) ════════ -->
+  {top_mkt_table}
 
   <!-- ════════ KOREAN SECTION ════════ -->
   <div class="lang-div"><span>🇰🇷 &nbsp;한국어 섹션</span></div>
 
-  {articles_html(news["kr_politics"], "lbl-pol", "정치")}
-  {articles_html(news["kr_economy"],  "lbl-eco", "경제")}
-  {articles_html(news["kr_society"],  "lbl-soc", "사회")}
-  {articles_html(news["kr_sports"],   "lbl-spt", "스포츠")}
-
-  {articles_html(news["kr_market_news"], "lbl-mkt", "증시 뉴스")}
-  {kr_mkt_table}
-  {articles_html(news["kr_crypto_news"], "lbl-cry", "크립토 &amp; 스테이블코인")}
-  {articles_html(news["kr_legal"], "lbl-leg", "법률")}
+  {articles_html(news["kr_politics"],    "lbl-pol", "정치",              full_count=1)}
+  {articles_html(news["kr_economy"],     "lbl-eco", "경제",              full_count=1)}
+  {articles_html(news["kr_society"],     "lbl-soc", "사회",              full_count=1)}
+  {articles_html(news["kr_sports"],      "lbl-spt", "스포츠",            full_count=1)}
+  {articles_html(news["kr_market_news"], "lbl-mkt", "증시 뉴스",         full_count=1)}
+  {articles_html(news["kr_crypto_news"], "lbl-cry", "크립토 &amp; 스테이블코인", full_count=1)}
+  {articles_html(news["kr_legal"],       "lbl-leg", "법률",              full_count=1)}
 
   <!-- ════════ ENGLISH SECTION ════════ -->
   <div class="lang-div"><span>🇺🇸 &nbsp;English Section</span></div>
@@ -441,12 +429,10 @@ def build_html(news: dict, mkt: dict) -> str:
   {articles_html(news["en_politics"],    "lbl-pol", "Politics")}
   {articles_html(news["en_economy"],     "lbl-eco", "Economy")}
   {articles_html(news["en_society"],     "lbl-spt", "Society &amp; Sports")}
-
   {articles_html(news["en_market_news"], "lbl-mkt", "Market News")}
-  {us_mkt_table}
   {articles_html(news["en_crypto_news"], "lbl-cry", "Crypto &amp; Stablecoins")}
-  {articles_html(news["en_legal"], "lbl-leg", "U.S. Legal News")}
-  {articles_html(news["en_bar"],   "lbl-bar", "BAR Exam")}
+  {articles_html(news["en_legal"],       "lbl-leg", "U.S. Legal News")}
+  {articles_html(news["en_bar"],         "lbl-bar", "BAR Exam")}
 
   <!-- ── FOOTER ────────────────────────────────── -->
   <div class="footer">
@@ -496,7 +482,6 @@ if __name__ == "__main__":
     print("[마켓 데이터 수집]")
     mkt = {
         "kr_indices": fetch_prices(KR_INDICES),
-        "kr_stocks":  fetch_prices(KR_STOCKS),
         "kr_crypto":  fetch_prices(KR_CRYPTO),
         "us_indices": fetch_prices(US_INDICES),
         "us_stocks":  fetch_prices(US_STOCKS),
