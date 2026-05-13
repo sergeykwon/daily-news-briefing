@@ -1,0 +1,47 @@
+=== Daily News Briefing — 2026년 05월 13일 (수) ===
+
+[kr_general] 뉴스 수집 중...
+  [연합뉴스] SKIP — <urlopen error [SSL: UNSAFE_LEGACY_RENEGOTIATION_DISABLED] unsafe legacy renegotiation disabled (_ssl.c:1010)>
+  [경향신문] SKIP — HTTP Error 404: Not Found
+  [MBC 뉴스] 0 articles fetched
+  [VOA 한국어] SKIP — HTTP Error 404: Not Found
+  → 0개 수집 완료
+
+[kr_stock] 뉴스 수집 중...
+  [한국경제] SKIP — <urlopen error [Errno -2] Name or service not known>
+  [매일경제] 0 articles fetched
+  [머니투데이] SKIP — HTTP Error 404: Not Found
+  [서울경제] SKIP — HTTP Error 404: Not Found
+  → 0개 수집 완료
+
+[kr_legal] 뉴스 수집 중...
+  [법률신문] SKIP — HTTP Error 404: Not Found
+  [법률저널] SKIP — HTTP Error 404: Not Found
+  [로앤비] SKIP — HTTP Error 404: Not Found
+  → 0개 수집 완료
+
+[en_politics] 뉴스 수집 중...
+  [NPR Politics] 2 articles fetched
+  [BBC US] 2 articles fetched
+  → 4개 수집 완료
+
+[en_economy] 뉴스 수집 중...
+  [Yahoo Finance] 2 articles fetched
+  [CNBC Markets] 2 articles fetched
+  → 4개 수집 완료
+
+[en_legal] 뉴스 수집 중...
+  [SCOTUSblog] 2 articles fetched
+  [Above the Law] 2 articles fetched
+  → 4개 수집 완료
+
+[en_bar] 뉴스 수집 중...
+  [Law School Toolbox] 2 articles fetched
+  [JD Advising] 2 articles fetched
+  → 4개 수집 완료
+
+이메일 HTML 빌드 중...
+발송 중: 📰 Daily News Briefing — 2026년 05월 13일 (수)
+  FROM : onboarding@resend.dev
+  TO   : ['sergeykwon@gmail.com']
+❌ Resend HTTP 403: error code: 1010
