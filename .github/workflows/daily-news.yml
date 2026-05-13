@@ -30,16 +30,23 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run news briefing
+        id: run
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           FROM_EMAIL: ${{ vars.FROM_EMAIL }}
           TO_OVERRIDE: ${{ github.event.inputs.to_override }}
-        run: python -u news_briefing.py 2>&1 | tee /tmp/briefing.log; exit ${PIPESTATUS[0]}
+        run: |
+          set -o pipefail
+          python -u news_briefing.py 2>&1 | tee /tmp/briefing.log
 
-      - name: Upload log artifact
+      - name: Commit log to repo
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: briefing-log
-          path: /tmp/briefing.log
-          retention-days: 3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          cp /tmp/briefing.log debug-latest.log 2>/dev/null || echo "(no log)" > debug-latest.log
+          git add debug-latest.log
+          git diff --cached --quiet || git commit -m "debug: log from run ${{ github.run_id }}"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
