@@ -265,12 +265,15 @@ body{margin:0;padding:0;background:#f5f3ff;font-family:'Segoe UI',Arial,Helvetic
 .lbl-leg{background:#fef9c3;color:#854d0e}
 .lbl-bar{background:#ccfbf1;color:#115e59}
 /* Article */
-.art-hl{font-size:20px;font-weight:900;color:#1e1b4b;line-height:1.25;margin:0 0 9px;font-family:Georgia,serif}
-.art-sum{font-size:14px;color:#4b5563;line-height:1.75;margin:0 0 12px}
-.art-btn{display:inline-block;background:#7c3aed;color:#fff;font-size:12px;font-weight:700;padding:9px 20px;border-radius:22px;text-decoration:none;letter-spacing:.3px}
-.art-divider{border:none;border-top:1px solid #f3f0ff;margin:18px 0}
+.art-hl{font-size:24px;font-weight:900;color:#1e1b4b;line-height:1.2;margin:0 0 10px;font-family:Georgia,serif;letter-spacing:-.3px}
+.art-sum{font-size:14px;color:#4b5563;line-height:1.8;margin:0 0 14px}
+.art-sum b,.art-sum strong{color:#1e1b4b;font-weight:700}
+.art-sum em,.art-sum i{color:#6d28d9;font-style:italic}
+.hl{background:#ede9fe;color:#5b21b6;padding:1px 5px;border-radius:3px;font-weight:700;font-style:normal}
+.art-btn{display:inline-block;background:#7c3aed;color:#ffffff;font-size:12px;font-weight:700;padding:9px 20px;border-radius:22px;text-decoration:none;letter-spacing:.3px;mso-padding-alt:0}
+.art-divider{border:none;border-top:1px solid #f3f0ff;margin:20px 0}
 /* Quick hits */
-.hits-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;margin:18px 0 10px}
+.hits-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;margin:18px 0 10px;border-top:1px solid #f3f0ff;padding-top:14px}
 .hit{display:flex;margin-bottom:9px;font-size:13px;line-height:1.6;align-items:flex-start}
 .hit-dot{color:#a78bfa;font-weight:900;margin-right:8px;flex-shrink:0;font-size:14px;line-height:1.5}
 .hit-text{color:#4b5563}
@@ -322,7 +325,7 @@ def market_table_html(title: str, sections: list[tuple[str, list]], note: str = 
     return f"""
   <div class="mkt-wrap">
     <div class="mkt-box">
-      <div class="mkt-header">📊 {title}</div>
+      <div class="mkt-header">{title}</div>
       {inner}
       {note_html}
     </div>
@@ -343,7 +346,7 @@ def articles_html(items: list, lbl_cls: str, lbl_label: str) -> str:
             sm = i['summary'].replace('<','&lt;').replace('>','&gt;')
             parts.append(f'<div class="art-hl">{hl}</div>'
                          f'<div class="art-sum">{sm}</div>'
-                         f'<a href="{i["url"]}" class="art-btn">Continue reading →</a>')
+                         f'<a href="{i["url"]}" class="art-btn" style="color:#ffffff;text-decoration:none">Continue reading →</a>')
         if hits:
             hit_items = "".join(
                 f'<div class="hit"><span class="hit-dot">◆</span>'
@@ -405,22 +408,22 @@ def build_html(news: dict, mkt: dict) -> str:
   <div class="hdr">
     <div class="hdr-eyebrow">Daily News Update</div>
     <div class="hdr-title">Your Daily Briefing</div>
-    <div class="hdr-sub">{DATE_KR} &nbsp;·&nbsp; 🇰🇷 한국어 + 🇺🇸 English</div>
+    <div class="hdr-sub">{DATE_KR} &nbsp;·&nbsp; 한국어 + English</div>
     <div class="hdr-badge">오늘의 핵심 뉴스 모음</div>
   </div>
 
   <!-- ── TOC ─────────────────────────────────────── -->
   <div class="toc">
     <div class="toc-title">In today's edition</div>
-    <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt">오늘의 국내 뉴스 — 정치 · 경제 · 사회 · 스포츠</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">📈</span><span class="toc-txt">국내외 마켓 데이터 &amp; 증시 · 크립토</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt">U.S. News — Politics · Economy · Society</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">📊</span><span class="toc-txt">U.S. Markets &amp; Crypto</span><span class="toc-arr">→</span></div>
-    <div class="toc-item"><span class="toc-ico">⚖️</span><span class="toc-txt">Legal News &amp; BAR Exam</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt"><strong>국내 뉴스</strong> — 정치 · 경제 · 사회 · 스포츠</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇰🇷</span><span class="toc-txt"><strong>국내외 마켓 데이터</strong> — 증시 · 크립토</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>U.S. News</strong> — Politics · Economy · Society</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>U.S. Markets</strong> — Stocks · Crypto</span><span class="toc-arr">→</span></div>
+    <div class="toc-item"><span class="toc-ico">🇺🇸</span><span class="toc-txt"><strong>Legal News</strong> &amp; BAR Exam</span><span class="toc-arr">→</span></div>
   </div>
 
-  <!-- ════════ 🇰🇷 KOREAN SECTION ════════ -->
-  <div class="lang-div"><span>🇰🇷 한국어 섹션</span></div>
+  <!-- ════════ KOREAN SECTION ════════ -->
+  <div class="lang-div"><span>🇰🇷 &nbsp;한국어 섹션</span></div>
 
   {articles_html(news["kr_politics"], "lbl-pol", "정치")}
   {articles_html(news["kr_economy"],  "lbl-eco", "경제")}
@@ -432,8 +435,8 @@ def build_html(news: dict, mkt: dict) -> str:
   {articles_html(news["kr_crypto_news"], "lbl-cry", "크립토 &amp; 스테이블코인")}
   {articles_html(news["kr_legal"], "lbl-leg", "법률")}
 
-  <!-- ════════ 🇺🇸 ENGLISH SECTION ════════ -->
-  <div class="lang-div"><span>🇺🇸 English Section</span></div>
+  <!-- ════════ ENGLISH SECTION ════════ -->
+  <div class="lang-div"><span>🇺🇸 &nbsp;English Section</span></div>
 
   {articles_html(news["en_politics"],    "lbl-pol", "Politics")}
   {articles_html(news["en_economy"],     "lbl-eco", "Economy")}
@@ -447,7 +450,7 @@ def build_html(news: dict, mkt: dict) -> str:
 
   <!-- ── FOOTER ────────────────────────────────── -->
   <div class="footer">
-    <div class="footer-brand">📰 Daily News Update</div>
+    <div class="footer-brand">Daily News Update</div>
     <p>{DATE_KR}</p>
     <p style="margin-top:8px">{", ".join(TO_EMAILS)}</p>
   </div>
