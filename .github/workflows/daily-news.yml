@@ -34,11 +34,12 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           FROM_EMAIL: ${{ vars.FROM_EMAIL }}
           TO_OVERRIDE: ${{ github.event.inputs.to_override }}
-        run: |
-          python -u news_briefing.py 2>&1 | tee /tmp/briefing.log
-          echo "## Run Output" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/briefing.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          # exit with original code
-          exit ${PIPESTATUS[0]}
+        run: python -u news_briefing.py 2>&1 | tee /tmp/briefing.log; exit ${PIPESTATUS[0]}
+
+      - name: Upload log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: briefing-log
+          path: /tmp/briefing.log
+          retention-days: 3
