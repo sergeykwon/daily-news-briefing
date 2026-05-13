@@ -1,0 +1,95 @@
+=== Daily News Briefing — 2026년 05월 13일 (수) ===
+
+[마켓 데이터 수집]
+  [^KS11] 7,807.68 +2.15%
+  [^KQ11] 1,171.88 -0.63%
+  [KRW=X] ₩1,490.2 +1.07%
+  [005930.KS] ₩283,000 +1.43%
+  [000660.KS] ₩1,967,000 +7.19%
+  [035420.KS] ₩201,000 -1.47%
+  [035720.KS] ₩42,800 -1.72%
+  [^IXIC] 26,088.20 -0.71%
+  [^GSPC] 7,400.96 -0.16%
+  [^DJI] 49,760.56 +0.11%
+  [^TNX] 4.463% +5.3 bps
+  [AMZN] $265.82 -1.18%
+  [GOOGL] $387.35 -0.33%
+  [AAPL] $294.80 +0.72%
+  [NVTS] $19.25 -15.01%
+  [ORCL] $186.83 -3.62%
+  [INTC] $120.61 -6.82%
+  [NVDA] $220.78 +0.61%
+
+[kr_politics]
+  [동아일보 정치] 3 articles
+  [한겨레 정치] 3 articles
+  → 4개
+
+[kr_economy]
+  [한국경제] 3 articles
+  [매일경제] 3 articles
+  → 4개
+
+[kr_society]
+  [한겨레 사회] 3 articles
+  [동아일보 사회] 0 articles
+  → 3개
+
+[kr_sports]
+  [동아일보 스포츠] 3 articles
+  [KBS 스포츠] 0 articles
+  → 3개
+
+[kr_market_news]
+  [한국경제 증권] 4 articles
+  → 4개
+
+[kr_crypto_news]
+  [토큰포스트] 4 articles
+  → 4개
+
+[kr_legal]
+  [법률신문] SKIP — HTTP Error 404: Not Found
+  [한국경제 사회] 3 articles
+  → 3개
+
+[en_politics]
+  [NPR Politics] 3 articles
+  [BBC US] 3 articles
+  → 4개
+
+[en_economy]
+  [CNBC Economy] SKIP — HTTP Error 403: Forbidden
+  [MarketWatch] 3 articles
+  [NPR Economy] 3 articles
+  → 4개
+
+[en_society]
+  [BBC World] 3 articles
+  [ESPN] 3 articles
+  → 4개
+
+[en_market_news]
+  [MarketWatch] 4 articles
+  → 4개
+
+[en_crypto_news]
+  [CoinDesk] 4 articles
+  → 4개
+
+[en_legal]
+  [SCOTUSblog] 3 articles
+  [Above the Law] 3 articles
+  → 4개
+
+[en_bar]
+  [JD Advising] 3 articles
+  [Law School Toolbox] 3 articles
+  → 4개
+
+HTML 빌드 중...
+
+발송: 📰 Daily News Briefing — 2026년 05월 13일 (수)
+  FROM : Daily News Update <onboarding@resend.dev>
+  TO   : ['sergeykwon@gmail.com']
+✅ 발송 완료! id=74bc58c2-d4b5-4557-a4a6-aed52373e71e
