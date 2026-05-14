@@ -1,19 +1,20 @@
-=== Daily News Briefing — 2026년 05월 14일 (목) ===
+=== Daily News Briefing — 2026년 05월 15일 (금) ===
 
 [마켓 데이터 수집]
-  [BTC-USD] $79,272 -1.50%
-  [ETH-USD] $2,255 -0.86%
-  [^IXIC] 26,402.34 +1.20%
-  [^GSPC] 7,444.25 +0.58%
-  [^DJI] 49,693.20 -0.14%
-  [^TNX] 4.481% +1.8 bps
-  [AMZN] $270.13 +1.62%
-  [GOOGL] $402.62 +3.94%
-  [AAPL] $298.87 +1.38%
-  [NVDA] $225.83 +2.29%
-  [TSLA] $445.27 +2.73%
-  [BTC-USD] $79,272 -1.50%
-  [ETH-USD] $2,255 -0.86%
+  [KRW=X] ₩1,492.7 +0.19%
+  [BTC-USD] $81,243 +2.48%
+  [ETH-USD] $2,293 +1.56%
+  [^IXIC] 26,635.22 +0.88%
+  [^GSPC] 7,501.24 +0.77%
+  [^DJI] 50,063.46 +0.75%
+  [^TNX] 4.461% -2.0 bps
+  [AMZN] $267.22 -1.08%
+  [GOOGL] $401.07 -0.38%
+  [AAPL] $298.21 -0.22%
+  [NVDA] $235.74 +4.39%
+  [TSLA] $443.30 -0.44%
+  [BTC-USD] $81,243 +2.48%
+  [ETH-USD] $2,293 +1.56%
 
 [kr_politics]
   [동아일보 정치] 3 articles
@@ -61,7 +62,8 @@
 
 [en_society]
   [BBC World] 3 articles
-  [ESPN] 3 articles
+  [ESPN] 0 articles
+  [NPR World] 3 articles
   → 4개
 
 [en_market_news]
@@ -84,7 +86,7 @@
 
 HTML 빌드 중...
 
-발송: 📰 Daily News Briefing — 2026년 05월 14일 (목)
+발송: 📰 Daily News Briefing — 2026년 05월 15일 (금)
   FROM : Daily News Update <onboarding@resend.dev>
   TO   : ['cmkim0316@gmail.com', 'sergeykwon@gmail.com']
-❌ Resend HTTP 403: {"statusCode":403,"name":"validation_error","message":"You can only send testing emails to your own email address (sergeykwon@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain."}
+❌ Resend HTTP 401: {"statusCode":401,"name":"validation_error","message":"API key is invalid"}
