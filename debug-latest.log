@@ -1,11 +1,11 @@
-=== Daily News Briefing — 2026년 05월 17일 (일) ===
+=== Daily News Briefing — 2026년 05월 18일 (월) ===
 
 [마켓 데이터 수집]
   [^KS11] 7,493.18 -6.12%
   [^KQ11] 1,129.82 -5.14%
-  [KRW=X] ₩1,497.8 +0.30%
-  [BTC-USD] $78,166 -1.14%
-  [ETH-USD] $2,180 -1.97%
+  [KRW=X] ₩1,497.9 +0.31%
+  [BTC-USD] $77,808 -0.41%
+  [ETH-USD] $2,173 -0.31%
   [^IXIC] 26,225.14 -1.54%
   [^GSPC] 7,408.50 -1.24%
   [^DJI] 49,526.17 -1.07%
@@ -15,8 +15,8 @@
   [AAPL] $300.23 +0.68%
   [NVDA] $225.32 -4.42%
   [TSLA] $422.24 -4.75%
-  [BTC-USD] $78,166 -1.14%
-  [ETH-USD] $2,180 -1.97%
+  [BTC-USD] $77,801 -0.42%
+  [ETH-USD] $2,173 -0.31%
 
 [kr_politics]
   [동아일보 정치] 3 articles
@@ -64,7 +64,8 @@
 
 [en_society]
   [BBC World] 3 articles
-  [ESPN] 3 articles
+  [ESPN] 0 articles
+  [NPR World] 3 articles
   → 4개
 
 [en_market_news]
@@ -82,12 +83,12 @@
 
 [en_bar]
   [JD Advising] 3 articles
-  [Law School Toolbox] 0 articles
-  → 3개
+  [Law School Toolbox] 3 articles
+  → 4개
 
 HTML 빌드 중...
 
-발송: 📰 Daily News Briefing — 2026년 05월 17일 (일)
+발송: 📰 Daily News Briefing — 2026년 05월 18일 (월)
   FROM : Daily News Update <onboarding@resend.dev>
   TO   : ['cmkim0316@gmail.com', 'sergeykwon@gmail.com']
 ❌ Resend HTTP 401: {"statusCode":401,"name":"validation_error","message":"API key is invalid"}
