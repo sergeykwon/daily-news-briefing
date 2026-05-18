@@ -1,22 +1,19 @@
-=== Daily News Briefing — 2026년 05월 18일 (월) ===
+=== Daily News Briefing — 2026년 05월 19일 (화) ===
 
 [마켓 데이터 수집]
-  [^KS11] 7,493.18 -6.12%
-  [^KQ11] 1,129.82 -5.14%
-  [KRW=X] ₩1,497.9 +0.31%
-  [BTC-USD] $77,808 -0.41%
-  [ETH-USD] $2,173 -0.31%
-  [^IXIC] 26,225.14 -1.54%
-  [^GSPC] 7,408.50 -1.24%
-  [^DJI] 49,526.17 -1.07%
-  [^TNX] 4.595% +13.4 bps
-  [AMZN] $264.14 -1.15%
-  [GOOGL] $396.78 -1.07%
-  [AAPL] $300.23 +0.68%
-  [NVDA] $225.32 -4.42%
-  [TSLA] $422.24 -4.75%
-  [BTC-USD] $77,801 -0.42%
-  [ETH-USD] $2,173 -0.31%
+  [BTC-USD] $76,956 -0.61%
+  [ETH-USD] $2,129 +0.07%
+  [^IXIC] 26,090.73 -0.51%
+  [^GSPC] 7,403.05 -0.07%
+  [^DJI] 49,686.12 +0.32%
+  [^TNX] 4.623% +2.8 bps
+  [AMZN] $264.86 +0.27%
+  [GOOGL] $396.94 +0.04%
+  [AAPL] $297.84 -0.80%
+  [NVDA] $222.32 -1.33%
+  [TSLA] $409.99 -2.90%
+  [BTC-USD] $76,956 -0.61%
+  [ETH-USD] $2,129 +0.07%
 
 [kr_politics]
   [동아일보 정치] 3 articles
@@ -64,8 +61,7 @@
 
 [en_society]
   [BBC World] 3 articles
-  [ESPN] 0 articles
-  [NPR World] 3 articles
+  [ESPN] 3 articles
   → 4개
 
 [en_market_news]
@@ -88,7 +84,7 @@
 
 HTML 빌드 중...
 
-발송: 📰 Daily News Briefing — 2026년 05월 18일 (월)
+발송: 📰 Daily News Briefing — 2026년 05월 19일 (화)
   FROM : Daily News Update <onboarding@resend.dev>
   TO   : ['cmkim0316@gmail.com', 'sergeykwon@gmail.com']
 ❌ Resend HTTP 401: {"statusCode":401,"name":"validation_error","message":"API key is invalid"}
